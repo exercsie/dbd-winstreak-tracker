@@ -76,4 +76,9 @@ void Tracker::buildKillerWinMap() {
 
         tracker[killer] = wins;
     }
+
+    // update wins
+    if(tracker.contains(killer)) {
+        wins = tracker.at(killer);
+    }
 }

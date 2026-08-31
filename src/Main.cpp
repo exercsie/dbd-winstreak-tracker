@@ -8,8 +8,6 @@
 #include <iostream>
 #include <limits>
 
-std::uint16_t wins{7};
-
 int main() {
     std::string killer;
     std::uint16_t choice;
