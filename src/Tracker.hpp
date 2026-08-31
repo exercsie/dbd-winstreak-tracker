@@ -17,13 +17,14 @@ public:
     void resetWinstreak();
     void setKiller(const std::string& k) { killer = k; }
     bool isValidKiller() const { return tracker.contains(killer); }
+    void updateFile();
 
     // getters
     std::unordered_map<std::string, std::uint16_t> getMap() const noexcept { return tracker; }
 
 private:
     std::string killer;
+    const std::string pathToKillerWinTracker = {"../Files/killer_win_info.txt"};
     std::uint16_t wins{};
     std::unordered_map<std::string, std::uint16_t> tracker;
-
 };

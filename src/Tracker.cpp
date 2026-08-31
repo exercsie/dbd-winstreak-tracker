@@ -31,6 +31,7 @@ void Tracker::winstreakCounter() noexcept {
     }
 
     mapUpdater(tracker);
+    updateFile();
 }
 
 void Tracker::mapUpdater(std::unordered_map<std::string, std::uint16_t>& tracker) noexcept {
@@ -46,11 +47,12 @@ void Tracker::resetWinstreak() {
     std::println("{}'s winstreak has been set to {}", killer, wins);
 
     mapUpdater(tracker);
+    updateFile();
 }
 
 void Tracker::buildKillerWinMap() {
     std::string stream;
-    std::ifstream trackerFile("../Files/killer_win_info.txt");
+    std::ifstream trackerFile(pathToKillerWinTracker);
 
     if(!trackerFile) {
         throw std::runtime_error("Cannot open killer_win_info.txt");
@@ -80,5 +82,18 @@ void Tracker::buildKillerWinMap() {
     // update wins
     if(tracker.contains(killer)) {
         wins = tracker.at(killer);
+    }
+}
+
+void Tracker::updateFile() {
+    std::ofstream trackerFile(pathToKillerWinTracker);
+
+    if(!trackerFile) {
+        throw std::runtime_error("Cannot open killer_win_info.txt");
+    }
+
+    trackerFile << "KILLER    |||    WINS\n";
+    for(const auto& [killer, wins] : tracker) {
+        trackerFile << killer << " | " << wins << '\n';
     }
 }
