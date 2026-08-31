@@ -18,6 +18,16 @@ int main() {
     while(true) {
         std::print("Enter your killer: ");
         std::getline(std::cin, killer);
+        // replace every space with a hyphon to match file
+        for(std::uint16_t i{}; i < killer.size(); ++i) {
+            if(killer[i] == ' ') {
+                killer[i] = '-';
+            }
+        }
+
+        // convert killer's name to uppercase for ../Files/killer_win_info.txt
+        std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
+
         break;
     }
 
