@@ -42,7 +42,6 @@ void Tracker::resetWinstreak() {
     if(wins == 0) {
         throw std::runtime_error("Cannot call resetWinstreak() when wins are already 0!");
     }
-
     
     char choice;
     while(true) {
@@ -121,5 +120,11 @@ void Tracker::updateFile() {
     trackerFile << "KILLER    |||    WINS\n";
     for(const auto& [killer, wins] : tracker) {
         trackerFile << killer << " | " << wins << '\n';
+    }
+}
+
+void Tracker::displayAllKillerWinstreaks() const {
+    for(const auto& [killer, wins] : tracker) {
+        std::println("Killer: {}\nWins: {}", killer, wins);
     }
 }

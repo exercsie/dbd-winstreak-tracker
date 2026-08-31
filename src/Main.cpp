@@ -46,6 +46,7 @@ int main() {
             std::println("2 - View winstreak on {}", killer);
             std::println("3 - Reset {}'s winstreak", killer);
             std::println("4 - Choose a new killer");
+            std::println("5 - View all Killer's winstreaks");
             std::cin >> choice;
             if(std::cin.fail()) {
                 std::cin.clear();
@@ -54,9 +55,9 @@ int main() {
                 continue;
             }
 
-            if(choice < 1 || choice > 4) {
+            if(choice < 1 || choice > 5) {
                 std::cin.clear();
-                std::println(std::cerr, "[ERROR] Please enter a number between 1 and 4");
+                std::println(std::cerr, "[ERROR] Please enter a number between 1 and 5");
                 continue;
             }
 
@@ -80,6 +81,11 @@ int main() {
 
                 case 4: {
                     isChoiceNewKiller = true;
+                    break;
+                }
+
+                case 5: {
+                    t.displayAllKillerWinstreaks();
                     break;
                 }
             }
