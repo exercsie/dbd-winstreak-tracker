@@ -43,11 +43,37 @@ void Tracker::resetWinstreak() {
         throw std::runtime_error("Cannot call resetWinstreak() when wins are already 0!");
     }
 
-    wins = 0;
-    std::println("{}'s winstreak has been set to {}", killer, wins);
-
-    mapUpdater(tracker);
-    updateFile();
+    
+    char choice;
+    while(true) {
+        std::println("Are you sure you want to reset {}'s winstreak? [Y/n]", killer);
+        std::cin >> choice;
+        if(std::cin.fail()) {
+            std::cin.clear();
+            std::println(std::cerr, "Please enter [Y/y]");
+            continue;
+        }
+        
+        choice = std::tolower(choice);
+        if(choice == 'n') {
+            std::println("{}'s winstreak reset avoided successfully", killer);
+            return;
+        }
+        
+        if(choice == 'y') {
+            wins = 0;
+            std::println("{}'s winstreak has been set to {}", killer, wins);
+            
+            mapUpdater(tracker);
+            updateFile();
+            return;
+        }
+        
+        std::println(std::cerr, "Please enter [Y/n]");
+    }
+    
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    
 }
 
 void Tracker::buildKillerWinMap() {
