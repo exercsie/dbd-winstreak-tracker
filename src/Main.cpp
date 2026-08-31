@@ -1,4 +1,5 @@
 #include "Tracker.hpp"
+#include "File.hpp"
 
 #include <unordered_map>
 #include <string>
@@ -12,8 +13,8 @@ std::uint16_t wins{7};
 int main() {
     std::string killer;
     std::uint16_t choice;
+    Tracker t;
 
-    
     std::println("Welcome to DBD winstreak tracker.");
     while(true) {
         std::print("Enter your killer: ");
@@ -24,15 +25,24 @@ int main() {
                 killer[i] = '-';
             }
         }
-
+        
         // convert killer's name to uppercase for ../Files/killer_win_info.txt
         std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
+        
+        // check entered killer is actually a killer
+        t.setKiller(killer);
+        t.buildKillerWinMap();
+
+        if(!t.isValidKiller()) {
+            std::println("{} does not exist", killer);
+            continue;
+        }
 
         break;
     }
 
-    Tracker t(killer);
-    
+    File f;
+
     while(true) {
         std::println("Choose an option: ");
         std::println("1 - Start counting winstreak on {}", killer);
@@ -61,7 +71,7 @@ int main() {
             }
 
             case 2: {
-                t.displayMap();
+                t.displayKillerWinstreak(killer);
                 break;
             }
 

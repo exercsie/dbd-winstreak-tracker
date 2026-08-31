@@ -5,10 +5,14 @@
 #include <string>
 #include <cstdint>
 #include <print>
+#include <fstream>
+#include <algorithm>
 
-void Tracker::displayMap() const {
+void Tracker::displayKillerWinstreak(const std::string& killerName) const {
     for(const auto& [killer, wins] : tracker) {
-        std::println("Killer: {}\nWins: {}", killer, wins);
+        if(killer == killerName) {
+            std::println("Killer: {}\nWins: {}", killer, wins);
+        }
     }
 }
 
@@ -30,9 +34,7 @@ void Tracker::winstreakCounter() noexcept {
 }
 
 void Tracker::mapUpdater(std::unordered_map<std::string, std::uint16_t>& tracker) noexcept {
-    tracker = {
-        { killer, wins }
-    };
+    tracker[killer] = wins;
 }
 
 void Tracker::resetWinstreak() {
@@ -41,11 +43,37 @@ void Tracker::resetWinstreak() {
     }
 
     wins = 0;
-    if(wins == 0) {
-        std::println("{}'s winstreak has been set to {}", killer, wins);
-    }
+    std::println("{}'s winstreak has been set to {}", killer, wins);
 
     mapUpdater(tracker);
 }
 
+void Tracker::buildKillerWinMap() {
+    std::string stream;
+    std::ifstream trackerFile("../Files/killer_win_info.txt");
 
+    if(!trackerFile) {
+        throw std::runtime_error("Cannot open killer_win_info.txt");
+    }
+
+    // skip "killer ||| wins" title
+    std::getline(trackerFile, stream);
+
+    while(std::getline(trackerFile, stream)) {
+        const std::uint16_t delimiter = stream.find('|');
+
+        // reach end of line
+        if(delimiter == std::string::npos) {
+            continue;
+        }
+
+        std::string killer = stream.substr(0, delimiter);
+        std::uint16_t wins = std::stoi(stream.substr(delimiter + 1));
+
+        if(!killer.empty() && killer.back() == ' ') {
+            killer.pop_back();
+        }
+
+        tracker[killer] = wins;
+    }
+}
