@@ -18,7 +18,7 @@ void Tracker::displayKillerWinstreak(const std::string& killerName) const {
 
 void Tracker::winstreakCounter() noexcept {
     std::string enter;
-    std::println("[CONSOLE] Hit enter to add one to the win, type 0 to exit");
+    std::println("[CONSOLE] Hit enter to add one to {}'s winstreak, type 0 to exit", killer);
     std::println("[CONSOLE] Wins: {}", wins);
     while(true) {
         std::getline(std::cin, enter);
@@ -32,6 +32,7 @@ void Tracker::winstreakCounter() noexcept {
 
     mapUpdater(tracker);
     updateFile();
+    std::println("[CONSOLE] {}'s winstreak is now {}", killer, wins);
 }
 
 void Tracker::mapUpdater(std::unordered_map<std::string, std::uint16_t>& tracker) noexcept {
@@ -46,7 +47,7 @@ void Tracker::resetWinstreak() {
     
     char choice;
     while(true) {
-        std::println("[CONSOLE] Are you sure you want to reset {}'s winstreak? [Y/n]", killer);
+        std::print("[CONSOLE] Are you sure you want to reset {}'s winstreak? [Y/n] ", killer);
         std::cin >> choice;
         if(std::cin.fail()) {
             std::cin.clear();
@@ -106,9 +107,7 @@ void Tracker::buildKillerWinMap() {
     }
 
     // update wins
-    if(tracker.contains(killer)) {
-        wins = tracker.at(killer);
-    }
+    wins = tracker.at(killer);
 }
 
 void Tracker::updateFile() {
@@ -134,4 +133,5 @@ void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
     wins = w;
     mapUpdater(tracker);
     updateFile();
+    std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, wins);
 }

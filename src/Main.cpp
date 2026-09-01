@@ -7,7 +7,7 @@
 #include <iostream>
 #include <limits>
 
-bool inputHandling(const std::int16_t choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 32767) {
+bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 99999) {
     if(std::cin.fail()) {
         std::cin.clear();
         std::cin.ignore(1000, '\n');
@@ -28,7 +28,7 @@ int main() {
     constexpr std::uint16_t lowerBound{1};
     constexpr std::uint16_t upperBound{6};
     std::string killer;
-    std::int16_t choice;
+    int choice;
     Tracker t;
 
     std::println("[CONSOLE] Welcome to DBD winstreak tracker.");
@@ -61,13 +61,14 @@ int main() {
             }
 
             std::println("---------------------------------------");
-            std::println("[CONSOLE] Choose an option: ");
-            std::println("1 - Start counting winstreak on {}", killer);
-            std::println("2 - View winstreak on {}", killer);
-            std::println("3 - Reset {}'s winstreak", killer);
-            std::println("4 - Choose a new killer");
-            std::println("5 - View all Killer's winstreaks");
-            std::println("6 - Choose {}'s amount of wins", killer);
+            std::println("[CONSOLE] Selected killer: {}", killer);
+            std::println("[CONSOLE] 1 - Start counting winstreak");
+            std::println("[CONSOLE] 2 - View winstreak");
+            std::println("[CONSOLE] 3 - Reset winstreak");
+            std::println("[CONSOLE] 4 - Choose a new killer");
+            std::println("[CONSOLE] 5 - View all Killer's winstreaks");
+            std::println("[CONSOLE] 6 - Set amount of wins");
+            std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
             std::println("---------------------------------------");
 
@@ -104,9 +105,16 @@ int main() {
                 }
 
                 case 6: {
+                    bool didAvoidSpecification{false};
                     while(true) {
-                        std::print("[CONSOLE] Enter number of wins to set {}'s winstreak to: ", killer);
+                        std::print("[CONSOLE] Enter number of wins to set {}'s winstreak to (type -1 to go back): ", killer);
                         std::cin >> choice;
+                        if(choice == -1) {
+                            std::println("[CONSOLE] {}'s winstreak specification avoided successfully", killer);
+                            didAvoidSpecification = true;
+                            break;
+                        }
+
                         if(!inputHandling(choice)) {
                             continue;
                         }
@@ -114,8 +122,12 @@ int main() {
                         break;
                     }
 
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                    t.specifyKillerWins(choice);
+                    if(!didAvoidSpecification) {
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        t.specifyKillerWins(choice);
+                        break;
+                    }
+
                     break;
                 }
             }
