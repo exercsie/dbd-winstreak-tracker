@@ -8,7 +8,7 @@
 #include <fstream>
 #include <algorithm>
 
-void Tracker::displayKillerWinstreak(const std::string& killerName) const {
+void Tracker::displayKillerWinstreak(const std::string& killerName) const noexcept {
     for(const auto& [killer, wins] : tracker) {
         if(killer == killerName) {
             std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
@@ -123,7 +123,7 @@ void Tracker::updateFile() {
     }
 }
 
-void Tracker::displayAllKillerWinstreaks() const {
+void Tracker::displayAllKillerWinstreaks() const noexcept {
     for(const auto& [killer, wins] : tracker) {
         std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
     }
@@ -135,3 +135,17 @@ void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
     updateFile();
     std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, wins);
 }
+
+void Tracker::displayKillerWinstreaksInReferenceToN(const int n) const noexcept {
+    bool notFound = true;
+    for(const auto& [killer, wins] : tracker) {
+        if(wins >= n) {
+            std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
+            notFound = false;
+        }
+    }
+
+    if(notFound) {
+        std::println("[CONSOLE] No results found!");
+    }
+} 

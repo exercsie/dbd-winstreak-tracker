@@ -24,9 +24,10 @@ public:
     void specifyKillerWins(std::uint16_t w) noexcept;
 
     // display
-    void displayKillerWinstreak(const std::string& killerName) const;
-    void displayAllKillerWinstreaks() const;
-    
+    void displayKillerWinstreak(const std::string& killerName) const noexcept;
+    void displayAllKillerWinstreaks() const noexcept;
+    void displayKillerWinstreaksInReferenceToN(const int n) const noexcept;
+
     // checkers
     bool isValidKiller() const { return tracker.contains(killer); }
 

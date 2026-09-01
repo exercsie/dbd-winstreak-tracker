@@ -7,7 +7,7 @@
 #include <iostream>
 #include <limits>
 
-bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 99999) {
+bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 65535) {
     if(std::cin.fail()) {
         std::cin.clear();
         std::cin.ignore(1000, '\n');
@@ -26,7 +26,7 @@ bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const s
 
 int main() {
     constexpr std::uint16_t lowerBound{1};
-    constexpr std::uint16_t upperBound{6};
+    constexpr std::uint16_t upperBound{7};
     std::string killer;
     int choice;
     Tracker t;
@@ -66,8 +66,9 @@ int main() {
             std::println("[CONSOLE] 2 - View winstreak");
             std::println("[CONSOLE] 3 - Reset winstreak");
             std::println("[CONSOLE] 4 - Choose a new killer");
-            std::println("[CONSOLE] 5 - View all Killer's winstreaks");
+            std::println("[CONSOLE] 5 - View all killer's winstreaks");
             std::println("[CONSOLE] 6 - Set amount of wins");
+            std::println("[CONSOLE] 7 - List all killers with a winstreak >= a number");
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
             std::println("---------------------------------------");
@@ -126,6 +127,28 @@ int main() {
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                         t.specifyKillerWins(choice);
                         break;
+                    }
+
+                    break;
+                }
+
+                case 7: {
+                    while(true) {
+                        std::print("[CONSOLE] Enter amount of wins to search for (type -1 to go back): ");
+                        std::cin >> choice;
+                        if(choice == -1) {
+                            break;
+                        }
+
+                        if(!inputHandling(choice)) {
+                            continue;
+                        }
+
+                        if(choice == 0) {
+                            t.displayAllKillerWinstreaks();
+                        }
+
+                        t.displayKillerWinstreaksInReferenceToN(choice);
                     }
 
                     break;
