@@ -7,11 +7,30 @@
 #include <iostream>
 #include <limits>
 
+bool inputHandling(const std::int16_t choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 32767) {
+    if(std::cin.fail()) {
+        std::cin.clear();
+        std::cin.ignore(1000, '\n');
+        std::println(std::cerr, "[ERROR] Please enter a number!");
+        return false;
+    }
+
+    if(choice < lowerBound || choice > upperBound) {
+        std::cin.clear();
+        std::println(std::cerr, "[ERROR] Please enter a number between {} and {}", lowerBound, upperBound);
+        return false;
+    }
+
+    return true;
+}
+
 int main() {
+    constexpr std::uint16_t lowerBound{1};
+    constexpr std::uint16_t upperBound{6};
     std::string killer;
-    std::uint16_t choice;
+    std::int16_t choice;
     Tracker t;
-    
+
     std::println("[CONSOLE] Welcome to DBD winstreak tracker.");
     while(true) {
         bool isChoiceNewKiller = false;
@@ -40,6 +59,7 @@ int main() {
             if(isChoiceNewKiller) {
                 break;
             }
+
             std::println("---------------------------------------");
             std::println("[CONSOLE] Choose an option: ");
             std::println("1 - Start counting winstreak on {}", killer);
@@ -47,18 +67,11 @@ int main() {
             std::println("3 - Reset {}'s winstreak", killer);
             std::println("4 - Choose a new killer");
             std::println("5 - View all Killer's winstreaks");
+            std::println("6 - Choose {}'s amount of wins", killer);
             std::cin >> choice;
             std::println("---------------------------------------");
-            if(std::cin.fail()) {
-                std::cin.clear();
-                std::cin.ignore(1000, '\n');
-                std::println(std::cerr, "[ERROR] Please enter a number!");
-                continue;
-            }
 
-            if(choice < 1 || choice > 5) {
-                std::cin.clear();
-                std::println(std::cerr, "[ERROR] Please enter a number between 1 and 5");
+            if(!inputHandling(choice, lowerBound, upperBound)) {
                 continue;
             }
 
@@ -87,6 +100,22 @@ int main() {
 
                 case 5: {
                     t.displayAllKillerWinstreaks();
+                    break;
+                }
+
+                case 6: {
+                    while(true) {
+                        std::print("[CONSOLE] Enter number of wins to set {}'s winstreak to: ", killer);
+                        std::cin >> choice;
+                        if(!inputHandling(choice)) {
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    t.specifyKillerWins(choice);
                     break;
                 }
             }

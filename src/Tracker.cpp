@@ -129,3 +129,9 @@ void Tracker::displayAllKillerWinstreaks() const {
         std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
     }
 }
+
+void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
+    wins = w;
+    mapUpdater(tracker);
+    updateFile();
+}

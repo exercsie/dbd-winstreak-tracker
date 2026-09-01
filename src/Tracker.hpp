@@ -21,7 +21,8 @@ public:
     void resetWinstreak();
     void setKiller(const std::string& k) { killer = k; }
     void updateFile();
-    
+    void specifyKillerWins(std::uint16_t w) noexcept;
+
     // display
     void displayKillerWinstreak(const std::string& killerName) const;
     void displayAllKillerWinstreaks() const;
