@@ -8,19 +8,88 @@
 #include <fstream>
 #include <algorithm>
 
-void Tracker::buildKillerWinMap() {
-    std::string stream;
-    std::ifstream trackerFile(pathToKillerWinTracker);
-
-    if(!trackerFile) {
-        throw std::runtime_error("Cannot open killer_win_info.txt");
+std::ifstream Tracker::fileCreator() {
+    if(!std::filesystem::exists(dbdWinTrackerDirectory)) {
+        std::filesystem::create_directories(dbdWinTrackerDirectory);
     }
 
-    // skip "killer ||| wins" title
-    std::getline(trackerFile, stream);
+    // if file doesn't exist create a file and populate
+    if(!std::filesystem::exists(dbdWinTrackerFile)) {
+        std::ofstream createFile(dbdWinTrackerFile);
+        if(!createFile) {
+            throw std::runtime_error("Failed to create dbd win tracker file!");
+        }
 
-    while(std::getline(trackerFile, stream)) {
-        const std::uint16_t delimiter = stream.find('|');
+        populateFile(createFile);
+    }
+
+    // return the file after trying to open
+    std::ifstream winInfoFile(dbdWinTrackerFile);
+    if(!winInfoFile) {
+        throw std::runtime_error("Cannot open dbd win tracker file!");
+    }
+
+    return winInfoFile;
+}
+
+void Tracker::populateFile(std::ofstream& populateFile) noexcept {
+    populateFile << "KILLER    |||    WINS\n";
+    populateFile << "THE-DEATHSLINGER | 0\n";
+    populateFile << "THE-CLOWN | 0\n";
+    populateFile << "THE-ARTIST | 0\n";
+    populateFile << "THE-DEMOGORGEN | 0\n";
+    populateFile << "THE-GOOD-GUY | 0\n";
+    populateFile << "THE-GHOST-FACE | 0\n";
+    populateFile << "THE-PIG | 0\n";
+    populateFile << "THE-NEMESIS | 0\n";
+    populateFile << "THE-BLIGHT | 0\n";
+    populateFile << "THE-DOCTOR | 0\n";
+    populateFile << "THE-FIRST | 0\n";
+    populateFile << "THE-LEGION | 0\n";
+    populateFile << "THE-TERRIFIER | 0\n";
+    populateFile << "THE-TWINS | 0\n";
+    populateFile << "THE-SKULL-MERCHANT | 0\n";
+    populateFile << "THE-NURSE | 0\n";
+    populateFile << "THE-JUDGEMENT | 0\n";
+    populateFile << "THE-CANNIBAL | 0\n";
+    populateFile << "THE-KNIGHT | 0\n";
+    populateFile << "THE-TRICKSTER | 0\n";
+    populateFile << "THE-HUNTRESS | 0\n";
+    populateFile << "THE-LICH | 0\n";
+    populateFile << "THE-GHOUL | 0\n";
+    populateFile << "THE-HAG | 0\n";
+    populateFile << "THE-MASTERMIND | 0\n";
+    populateFile << "THE-UNKNOWN | 0\n";
+    populateFile << "THE-NIGHTMARE | 0\n";
+    populateFile << "THE-ONRYO | 0\n";
+    populateFile << "THE-ONI | 0\n";
+    populateFile << "THE-HILLBILLY | 0\n";
+    populateFile << "THE-WRAITH | 0\n";
+    populateFile << "THE-KRASUE | 0\n";
+    populateFile << "THE-TRAPPER | 0\n";
+    populateFile << "THE-XENOMORPH | 0\n";
+    populateFile << "THE-SLASHER | 0\n";
+    populateFile << "THE-CENOBITE | 0\n";
+    populateFile << "THE-DREDGE | 0\n";
+    populateFile << "THE-DARK-LORD | 0\n";
+    populateFile << "THE-ANIMATRONIC | 0\n";
+    populateFile << "THE-SPIRIT | 0\n";
+    populateFile << "THE-SHAPE | 0\n";
+    populateFile << "THE-PLAGUE | 0\n";
+    populateFile << "THE-EXECUTIONER | 0\n";
+    populateFile << "THE-SINGULARITY | 0\n";
+}
+
+void Tracker::buildKillerWinMap() {
+    std::string stream;
+    std::ifstream winInfoFile;
+    winInfoFile = fileCreator();
+
+    // skip "killer ||| wins" title
+    std::getline(winInfoFile, stream);
+
+    while(std::getline(winInfoFile, stream)) {
+        const std::size_t delimiter = stream.find('|');
 
         // reach end of line
         if(delimiter == std::string::npos) {
@@ -102,7 +171,7 @@ void Tracker::resetWinstreak() noexcept {
 }
 
 void Tracker::updateFile() {
-    std::ofstream trackerFile(pathToKillerWinTracker);
+    std::ofstream trackerFile(dbdWinTrackerFile);
 
     if(!trackerFile) {
         throw std::runtime_error("Cannot open killer_win_info.txt");

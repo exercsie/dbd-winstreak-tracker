@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include <string>
+#include <filesystem>
 
 class Tracker {
 public:
@@ -14,6 +15,10 @@ public:
     // destructor
     ~Tracker() noexcept = default;
     
+    // file
+    std::ifstream fileCreator();
+    void populateFile(std::ofstream&) noexcept;
+
     // updaters
     void buildKillerWinMap();
     void mapUpdater(std::unordered_map<std::string, std::uint16_t>&) noexcept;
@@ -35,8 +40,9 @@ public:
     std::unordered_map<std::string, std::uint16_t> getMap() const noexcept { return tracker; }
 
 private:
+    const std::filesystem::path dbdWinTrackerDirectory = std::filesystem::path(std::getenv("HOME")) / ".config/tracker";
+    const std::filesystem::path dbdWinTrackerFile = dbdWinTrackerDirectory / "killer_win_info.txt";
     std::string killer;
-    const std::string pathToKillerWinTracker = {"../Files/killer_win_info.txt"};
     std::uint16_t wins{};
     std::unordered_map<std::string, std::uint16_t> tracker;
 };
