@@ -12,10 +12,10 @@ int main() {
     std::uint16_t choice;
     Tracker t;
     
-    std::println("Welcome to DBD winstreak tracker.");
+    std::println("[CONSOLE] Welcome to DBD winstreak tracker.");
     while(true) {
         bool isChoiceNewKiller = false;
-        std::print("Enter your killer: ");
+        std::print("[CONSOLE] Enter your killer: ");
         std::getline(std::cin, killer);
         // replace every space with a hyphon to match file
         for(std::uint16_t i{}; i < killer.size(); ++i) {
@@ -32,7 +32,7 @@ int main() {
         t.buildKillerWinMap();
 
         if(!t.isValidKiller()) {
-            std::println("{} does not exist", killer);
+            std::println(std::cerr, "[ERROR] {} does not exist. Example usage, \"The Terrifier\".", killer);
             continue;
         }
 
@@ -40,14 +40,15 @@ int main() {
             if(isChoiceNewKiller) {
                 break;
             }
-
-            std::println("Choose an option: ");
+            std::println("---------------------------------------");
+            std::println("[CONSOLE] Choose an option: ");
             std::println("1 - Start counting winstreak on {}", killer);
             std::println("2 - View winstreak on {}", killer);
             std::println("3 - Reset {}'s winstreak", killer);
             std::println("4 - Choose a new killer");
             std::println("5 - View all Killer's winstreaks");
             std::cin >> choice;
+            std::println("---------------------------------------");
             if(std::cin.fail()) {
                 std::cin.clear();
                 std::cin.ignore(1000, '\n');

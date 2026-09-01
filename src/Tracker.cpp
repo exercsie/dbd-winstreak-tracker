@@ -11,20 +11,20 @@
 void Tracker::displayKillerWinstreak(const std::string& killerName) const {
     for(const auto& [killer, wins] : tracker) {
         if(killer == killerName) {
-            std::println("Killer: {}\nWins: {}", killer, wins);
+            std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
         }
     }
 }
 
 void Tracker::winstreakCounter() noexcept {
     std::string enter;
-    std::println("Hit enter to add one to the win, type 0 to exit");
-    std::println("Wins: {}", wins);
+    std::println("[CONSOLE] Hit enter to add one to the win, type 0 to exit");
+    std::println("[CONSOLE] Wins: {}", wins);
     while(true) {
         std::getline(std::cin, enter);
         if(enter.empty()) {
             ++wins;
-            std::println("Wins: {}", wins);
+            std::println("[CONSOLE] Wins: {}", wins);
         } else {
             break;
         }
@@ -40,35 +40,36 @@ void Tracker::mapUpdater(std::unordered_map<std::string, std::uint16_t>& tracker
 
 void Tracker::resetWinstreak() {
     if(wins == 0) {
-        throw std::runtime_error("Cannot call resetWinstreak() when wins are already 0!");
+        std::println(std::cerr, "[ERROR] {}'s wins are already at 0!", killer);
+        return;
     }
     
     char choice;
     while(true) {
-        std::println("Are you sure you want to reset {}'s winstreak? [Y/n]", killer);
+        std::println("[CONSOLE] Are you sure you want to reset {}'s winstreak? [Y/n]", killer);
         std::cin >> choice;
         if(std::cin.fail()) {
             std::cin.clear();
-            std::println(std::cerr, "Please enter [Y/y]");
+            std::println(std::cerr, "[ERROR] Please enter [Y/n]");
             continue;
         }
         
         choice = std::tolower(choice);
         if(choice == 'n') {
-            std::println("{}'s winstreak reset avoided successfully", killer);
+            std::println("[CONSOLE] {}'s winstreak reset avoided successfully", killer);
             return;
         }
         
         if(choice == 'y') {
             wins = 0;
-            std::println("{}'s winstreak has been set to {}", killer, wins);
+            std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, wins);
             
             mapUpdater(tracker);
             updateFile();
             return;
         }
         
-        std::println(std::cerr, "Please enter [Y/n]");
+        std::println(std::cerr, "[ERROR] Please enter [Y/n]");
     }
     
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -125,6 +126,6 @@ void Tracker::updateFile() {
 
 void Tracker::displayAllKillerWinstreaks() const {
     for(const auto& [killer, wins] : tracker) {
-        std::println("Killer: {}\nWins: {}", killer, wins);
+        std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
     }
 }
