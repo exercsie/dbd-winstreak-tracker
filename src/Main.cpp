@@ -65,10 +65,10 @@ int main() {
             std::println("[CONSOLE] 1 - Start counting winstreak");
             std::println("[CONSOLE] 2 - View winstreak");
             std::println("[CONSOLE] 3 - Reset winstreak");
-            std::println("[CONSOLE] 4 - Choose a new killer");
+            std::println("[CONSOLE] 4 - Set amount of wins");
             std::println("[CONSOLE] 5 - View all killer's winstreaks");
-            std::println("[CONSOLE] 6 - Set amount of wins");
-            std::println("[CONSOLE] 7 - List all killers with a winstreak >= a number");
+            std::println("[CONSOLE] 6 - View all killers with a winstreak >= a number");
+            std::println("[CONSOLE] 7 - Choose a new killer");
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
             std::println("---------------------------------------");
@@ -96,16 +96,6 @@ int main() {
                 }
 
                 case 4: {
-                    isChoiceNewKiller = true;
-                    break;
-                }
-
-                case 5: {
-                    t.displayAllKillerWinstreaks();
-                    break;
-                }
-
-                case 6: {
                     bool didAvoidSpecification{false};
                     while(true) {
                         std::print("[CONSOLE] Enter number of wins to set {}'s winstreak to (type -1 to go back): ", killer);
@@ -132,7 +122,12 @@ int main() {
                     break;
                 }
 
-                case 7: {
+                case 5: {
+                    t.displayAllKillerWinstreaks();
+                    break;
+                }
+
+                case 6: {
                     while(true) {
                         std::print("[CONSOLE] Enter amount of wins to search for (type -1 to go back): ");
                         std::cin >> choice;
@@ -151,6 +146,11 @@ int main() {
                         t.displayKillerWinstreaksInReferenceToN(choice);
                     }
 
+                    break;
+                }
+
+                case 7: {
+                    isChoiceNewKiller = true;
                     break;
                 }
             }

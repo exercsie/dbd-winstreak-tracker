@@ -18,10 +18,10 @@ public:
     void buildKillerWinMap();
     void mapUpdater(std::unordered_map<std::string, std::uint16_t>&) noexcept;
     void winstreakCounter() noexcept;
-    void resetWinstreak();
-    void setKiller(const std::string& k) { killer = k; }
+    void resetWinstreak() noexcept;
     void updateFile();
     void specifyKillerWins(std::uint16_t w) noexcept;
+    void setKiller(const std::string& k) { killer = k; }
 
     // display
     void displayKillerWinstreak(const std::string& killerName) const noexcept;

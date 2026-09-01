@@ -8,12 +8,41 @@
 #include <fstream>
 #include <algorithm>
 
-void Tracker::displayKillerWinstreak(const std::string& killerName) const noexcept {
-    for(const auto& [killer, wins] : tracker) {
-        if(killer == killerName) {
-            std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
-        }
+void Tracker::buildKillerWinMap() {
+    std::string stream;
+    std::ifstream trackerFile(pathToKillerWinTracker);
+
+    if(!trackerFile) {
+        throw std::runtime_error("Cannot open killer_win_info.txt");
     }
+
+    // skip "killer ||| wins" title
+    std::getline(trackerFile, stream);
+
+    while(std::getline(trackerFile, stream)) {
+        const std::uint16_t delimiter = stream.find('|');
+
+        // reach end of line
+        if(delimiter == std::string::npos) {
+            continue;
+        }
+
+        std::string killer = stream.substr(0, delimiter);
+        std::uint16_t wins = std::stoi(stream.substr(delimiter + 1));
+
+        if(!killer.empty() && killer.back() == ' ') {
+            killer.pop_back();
+        }
+
+        tracker[killer] = wins;
+    }
+    
+    // update wins
+    wins = tracker.at(killer);
+}
+
+void Tracker::mapUpdater(std::unordered_map<std::string, std::uint16_t>& tracker) noexcept {
+    tracker[killer] = wins;
 }
 
 void Tracker::winstreakCounter() noexcept {
@@ -35,11 +64,7 @@ void Tracker::winstreakCounter() noexcept {
     std::println("[CONSOLE] {}'s winstreak is now {}", killer, wins);
 }
 
-void Tracker::mapUpdater(std::unordered_map<std::string, std::uint16_t>& tracker) noexcept {
-    tracker[killer] = wins;
-}
-
-void Tracker::resetWinstreak() {
+void Tracker::resetWinstreak() noexcept {
     if(wins == 0) {
         std::println(std::cerr, "[ERROR] {}'s wins are already at 0!", killer);
         return;
@@ -74,40 +99,6 @@ void Tracker::resetWinstreak() {
     }
     
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    
-}
-
-void Tracker::buildKillerWinMap() {
-    std::string stream;
-    std::ifstream trackerFile(pathToKillerWinTracker);
-
-    if(!trackerFile) {
-        throw std::runtime_error("Cannot open killer_win_info.txt");
-    }
-
-    // skip "killer ||| wins" title
-    std::getline(trackerFile, stream);
-
-    while(std::getline(trackerFile, stream)) {
-        const std::uint16_t delimiter = stream.find('|');
-
-        // reach end of line
-        if(delimiter == std::string::npos) {
-            continue;
-        }
-
-        std::string killer = stream.substr(0, delimiter);
-        std::uint16_t wins = std::stoi(stream.substr(delimiter + 1));
-
-        if(!killer.empty() && killer.back() == ' ') {
-            killer.pop_back();
-        }
-
-        tracker[killer] = wins;
-    }
-
-    // update wins
-    wins = tracker.at(killer);
 }
 
 void Tracker::updateFile() {
@@ -123,17 +114,25 @@ void Tracker::updateFile() {
     }
 }
 
-void Tracker::displayAllKillerWinstreaks() const noexcept {
-    for(const auto& [killer, wins] : tracker) {
-        std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
-    }
-}
-
 void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
     wins = w;
     mapUpdater(tracker);
     updateFile();
     std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, wins);
+}
+
+void Tracker::displayKillerWinstreak(const std::string& killerName) const noexcept {
+    for(const auto& [killer, wins] : tracker) {
+        if(killer == killerName) {
+            std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
+        }
+    }
+}
+
+void Tracker::displayAllKillerWinstreaks() const noexcept {
+    for(const auto& [killer, wins] : tracker) {
+        std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, wins);
+    }
 }
 
 void Tracker::displayKillerWinstreaksInReferenceToN(const int n) const noexcept {
