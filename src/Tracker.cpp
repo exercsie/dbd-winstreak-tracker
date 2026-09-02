@@ -123,13 +123,18 @@ void Tracker::winstreakCounter() noexcept {
         if(enter.empty()) {
             ++wins;
             std::println("[CONSOLE] Wins: {}", wins);
+            mapUpdater(tracker);
+            updateFile();
+        } else if(enter == "-") {
+            --wins;
+            std::println("[CONSOLE] Wins: {}", wins);
+            mapUpdater(tracker);
+            updateFile();
         } else {
             break;
         }
     }
 
-    mapUpdater(tracker);
-    updateFile();
     std::println("[CONSOLE] {}'s winstreak is now {}", killer, wins);
 }
 

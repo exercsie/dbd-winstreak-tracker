@@ -9,14 +9,14 @@ class Tracker {
 public:
     // constructors
     explicit Tracker(const std::string& k, std::uint16_t w) : killer(k), wins(w) {};
-    explicit Tracker(std::string& k) : killer(k), wins(0) {};
+    explicit Tracker(const std::string& k) : killer(k), wins(0) {};
     explicit Tracker() = default;
 
     // destructor
     ~Tracker() noexcept = default;
     
     // file
-    std::ifstream fileCreator();
+    [[nodiscard]] std::ifstream fileCreator();
     void populateFile(std::ofstream&) noexcept;
 
     // updaters
@@ -34,10 +34,10 @@ public:
     void displayKillerWinstreaksInReferenceToN(const int n) const noexcept;
 
     // checkers
-    bool isValidKiller() const { return tracker.contains(killer); }
+    [[nodiscard]] bool isValidKiller() const { return tracker.contains(killer); }
 
     // getters
-    std::unordered_map<std::string, std::uint16_t> getMap() const noexcept { return tracker; }
+    [[nodiscard]] std::unordered_map<std::string, std::uint16_t> getMap() const noexcept { return tracker; }
 
 private:
     const std::filesystem::path dbdWinTrackerDirectory = std::filesystem::path(std::getenv("HOME")) / ".config/tracker";
