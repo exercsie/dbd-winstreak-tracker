@@ -24,9 +24,47 @@ bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const s
     return true;
 }
 
+void killerAliases(std::string& k) {
+    const std::unordered_map<std::string, std::string> aliases {
+        {"BUBBA", "THE-CANNIBAL"},
+        {"LEATHERFACE", "THE-CANNIBAL"},
+        {"LEATHER-FACE", "THE-CANNIBAL"},
+        {"BILLY", "THE-HILLBILLY"},
+        {"DEMO", "THE-DEMOGORGEN"},
+        {"WESKER", "THE-MASTERMIND"},
+        {"MYERS", "THE-SHAPE"},
+        {"MICHAEL-MYERS", "THE-SHAPE"},
+        {"DOC", "THE-DOCTOR"},
+        {"FREDDY", "THE-NIGHTMARE"},
+        {"FREDDY-KRUEGER", "THE-NIGHTMARE"},
+        {"GHOSTFACE", "THE-GHOST-FACE"},
+        {"SLINGER", "THE-DEATHSLINGER"},
+        {"PYRAMID-HEAD", "THE-EXECUTIONER"},
+        {"PYRAMIDHEAD", "THE-EXECUTIONER"},
+        {"PINHEAD", "THE-CENOBITE"},
+        {"PIN-HEAD", "THE-CENOBITE"},
+        {"SADAKO", "THE-ONRYO"},
+        {"XENO", "THE-XENOMORPH"},
+        {"CHUCKY", "THE-GOOD-GUY"},
+        {"VECNA", "THE-LICH"},
+        {"DRACULA", "THE-DARK-LORD"},
+        {"DRAC", "THE-DARK-LORD"},
+        {"KEN", "THE-GHOUL"},
+        {"KEN-KANEKI", "THE-GHOUL"},
+        {"SPRINGTRAP", "THE-ANIMATRONIC"}
+    };
+
+    if(const auto it = aliases.find(k); it != aliases.end()) {
+        k = it->second;
+    } else if(!k.starts_with("THE-")) {
+        k = std::format("THE-{}", k);
+    }
+
+}
+
 int main() {
     constexpr std::uint16_t lowerBound{1};
-    constexpr std::uint16_t upperBound{7};
+    constexpr std::uint16_t upperBound{6};
     std::string killer;
     int choice;
     Tracker t;
@@ -42,7 +80,6 @@ int main() {
             continue;
         }
 
-
         // replace every space with a hyphon to match file
         for(std::uint16_t i{}; i < killer.size(); ++i) {
             if(killer[i] == ' ') {
@@ -53,11 +90,12 @@ int main() {
         // convert killer's name to uppercase for killer_win_info.txt
         std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
         
-        // check entered killer is actually a killer
+        killerAliases(killer);
         
         t.setKiller(killer);
         t.buildKillerWinMap();
         
+        // check entered killer is actually a killer
         if(!t.isValidKiller()) {
             std::println(std::cerr, "[ERROR] {} does not exist. Example usage, \"The Terrifier\".", killer);
             continue;
