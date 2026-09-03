@@ -63,7 +63,7 @@ void killerAliases(std::string& k) {
 }
 
 int main() {
-    constexpr std::uint16_t lowerBound{1};
+    constexpr std::uint16_t lowerBound{0};
     constexpr std::uint16_t upperBound{6};
     std::string killer;
     int choice;
@@ -108,6 +108,7 @@ int main() {
 
             std::println("---------------------------------------");
             std::println("[CONSOLE] Selected killer: {}", killer);
+            std::println("[CONSOLE] 0 - Exit");
             std::println("[CONSOLE] 1 - Start counting winstreak");
             std::println("[CONSOLE] 2 - View {}'s stats", killer);
             std::println("[CONSOLE] 3 - Reset stats options");
@@ -124,6 +125,10 @@ int main() {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clear stream 
 
             switch(choice) {
+                case 0: {
+                    return 0;
+                }
+
                 case 1: {
                     t.winstreakCounter();
                     break;

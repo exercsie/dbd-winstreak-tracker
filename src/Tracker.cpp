@@ -127,13 +127,12 @@ void Tracker::winstreakCounter() noexcept {
     std::string enter;
     std::println("---------------------------------------");
     std::println("[CONSOLE] Hit enter to add one to {}'s winstreak, type 0 to save", killer);
-    std::println("[CONSOLE] Wins: {}", d.wins);
+    std::print("[CONSOLE] Wins: {} ", d.wins);
     while(true) {
         std::getline(std::cin, enter);
         if(enter.empty()) {
             ++d.wins;
-            std::println("---------------------------------------");
-            std::println("[CONSOLE] Wins: {}", d.wins);
+            std::print("[CONSOLE] Wins: {} ", d.wins);
             if(d.personalBest < d.wins) {
                 d.personalBest = d.wins;
             }
@@ -151,8 +150,7 @@ void Tracker::winstreakCounter() noexcept {
             }
 
             --d.wins;
-            std::println("---------------------------------------");
-            std::println("[CONSOLE] Wins: {}", d.wins);
+            std::print("[CONSOLE] Wins: {} ", d.wins);
             mapUpdater();
             updateFile();
         } else {
@@ -210,7 +208,7 @@ void Tracker::resetPersonalBest() noexcept {
     char choice;
     while(true) {
         std::println("---------------------------------------");
-        std::print("[CONSOLE] Are you sure you want to reset {}'s personal best? [Y/n] ", killer);
+        std::print("[CONSOLE] Are you sure you want to reset {}'s personal best? This will also reset wins [Y/n] ", killer);
         std::cin >> choice;
         if(std::cin.fail()) {
             std::cin.clear();
@@ -226,7 +224,8 @@ void Tracker::resetPersonalBest() noexcept {
         
         if(choice == 'y') {
             d.personalBest = 0;
-            std::println("[CONSOLE] {}'s personal best has been set to {}", killer, d.wins);
+            d.wins = 0;
+            std::println("[CONSOLE] {}'s personal best  and wins have been set to {}", killer, d.personalBest);
             
             mapUpdater();
             updateFile();
@@ -258,7 +257,6 @@ void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
         d.personalBest = w;
         mapUpdater();
         updateFile();
-        std::println("---------------------------------------");
         std::println("[CONSOLE] {}'s winstreak and personal best has been set to {}", killer, w);
         return;
     }
@@ -266,7 +264,6 @@ void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
     d.wins = w;
     mapUpdater();
     updateFile();
-    std::println("---------------------------------------");
     std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, d.wins);
 }
 
@@ -276,7 +273,6 @@ void Tracker::setPersonalBest(std::uint16_t pb) noexcept {
         d.personalBest = pb;
         mapUpdater();
         updateFile();
-        std::println("---------------------------------------");
         std::println("[CONSOLE] {}'s personal best and winstreak has been set to: {}", killer, pb);
         return;
     }
@@ -284,7 +280,6 @@ void Tracker::setPersonalBest(std::uint16_t pb) noexcept {
     d.personalBest = pb;
     mapUpdater();
     updateFile();
-    std::println("---------------------------------------");
     std::println("[CONSOLE] {}'s personal best has been set to: {}", killer, pb);
 }
 
