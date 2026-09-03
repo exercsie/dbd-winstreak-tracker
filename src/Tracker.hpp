@@ -43,13 +43,13 @@ public:
 
     // display
     void displayKillerWinstreak(const std::string& killerName) const noexcept;
-    void displayAllKillerWinstreaks() const noexcept;
+    void displayAllKillerInfo() const noexcept;
     void displayKillerWinstreaksInReferenceToN(const int n) const noexcept;
+    void displayKillerPersonalBestsInReferenceToN(const int n) const noexcept;
 
     // checkers
     [[nodiscard]] bool isValidKiller() const { return tracker.contains(killer); }
 
     // getters
     [[nodiscard]] std::unordered_map<std::string, data> getMap() const noexcept { return tracker; }
-
 };

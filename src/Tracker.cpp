@@ -113,7 +113,7 @@ void Tracker::buildKillerWinMap() {
         tracker[killer] = data{wins, pb};
     }
     
-    // update wins
+    // update data
     d = tracker.at(this->killer);
 }
 
@@ -242,7 +242,7 @@ void Tracker::displayKillerWinstreak(const std::string& killerName) const noexce
     }
 }
 
-void Tracker::displayAllKillerWinstreaks() const noexcept {
+void Tracker::displayAllKillerInfo() const noexcept {
     for(const auto& [killer, data] : tracker) {
         std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}\n[CONSOLE] PB: {}", killer, data.wins, data.personalBest);
     }
@@ -252,7 +252,7 @@ void Tracker::displayKillerWinstreaksInReferenceToN(const int n) const noexcept 
     bool notFound = true;
     for(const auto& [killer, data] : tracker) {
         if(data.wins >= n) {
-            std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}\n[CONSOLE] PB: {}", killer, data.wins, data.personalBest);
+            std::println("[CONSOLE] Killer: {}\n[CONSOLE] Wins: {}", killer, data.wins);
             notFound = false;
         }
     }
@@ -261,3 +261,17 @@ void Tracker::displayKillerWinstreaksInReferenceToN(const int n) const noexcept 
         std::println("[CONSOLE] No results found!");
     }
 } 
+
+void Tracker::displayKillerPersonalBestsInReferenceToN(const int n) const noexcept {
+    bool notFound = true;
+    for(const auto& [killer, data] : tracker) {
+        if(data.personalBest >= n) {
+            std::println("[CONSOLE] Killer: {}\n[CONSOLE] PB: {}", killer, data.personalBest);
+            notFound = false;
+        }
+    }
+
+    if(notFound) {
+        std::println("[CONSOLE] No results found!");
+    }
+}

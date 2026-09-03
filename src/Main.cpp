@@ -26,7 +26,7 @@ bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const s
 
 int main() {
     constexpr std::uint16_t lowerBound{1};
-    constexpr std::uint16_t upperBound{8};
+    constexpr std::uint16_t upperBound{7};
     std::string killer;
     int choice;
     Tracker t;
@@ -43,7 +43,7 @@ int main() {
             }
         }
         
-        // convert killer's name to uppercase for ../Files/killer_win_info.txt
+        // convert killer's name to uppercase for killer_win_info.txt
         std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
         
         // check entered killer is actually a killer
@@ -67,9 +67,8 @@ int main() {
             std::println("[CONSOLE] 3 - Reset winstreak");
             std::println("[CONSOLE] 4 - Set amount of wins");
             std::println("[CONSOLE] 5 - Set personal best");
-            std::println("[CONSOLE] 6 - View all killer's winstreaks");
-            std::println("[CONSOLE] 7 - View all killers with a winstreak >= a number");
-            std::println("[CONSOLE] 8 - Choose a new killer");
+            std::println("[CONSOLE] 6 - Query data");
+            std::println("[CONSOLE] 7 - Choose a new killer");
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
             std::println("---------------------------------------");
@@ -151,33 +150,70 @@ int main() {
                 }
 
                 case 6: {
-                    t.displayAllKillerWinstreaks();
-                    break;
-                }
-
-                case 7: {
                     while(true) {
-                        std::print("[CONSOLE] Enter amount of wins to search for (type -1 to go back): ");
+                        std::println("[CONSOLE] 1 - View all killer's info");
+                        std::println("[CONSOLE] 2 - View all killer's winstreaks >= a number");
+                        std::println("[CONSOLE] 3 - View all killer's personal bests >= a number");
+                        std::print("[CONSOLE] Enter an option (type -1 to go back): ");
                         std::cin >> choice;
+
                         if(choice == -1) {
                             break;
                         }
 
-                        if(!inputHandling(choice)) {
+                        if(!inputHandling(choice, 1, 3)) {
                             continue;
                         }
 
-                        if(choice == 0) {
-                            t.displayAllKillerWinstreaks();
+                        switch(choice) {
+                            case 1: {
+                                t.displayAllKillerInfo();
+                                break;
+                            }
+
+                            case 2: {
+                                while(true) {
+                                    std::print("[CONSOLE] Enter amount of wins to search for (type -1 to go back): ");
+                                    std::cin >> choice;
+                                    if(choice == -1) {
+                                        break;
+                                    }
+
+                                    if(!inputHandling(choice)) {
+                                        continue;
+                                    }
+
+                                    t.displayKillerWinstreaksInReferenceToN(choice);
+                                }
+
+                                break;
+                            }
+
+                            case 3: {
+                                while(true) {
+                                    std::print("[CONSOLE] Enter a personal best to search for (type -1 to go back): ");
+                                    std::cin >> choice;
+                                    if(choice == -1) {
+                                        break;
+                                    }
+
+                                    if(!inputHandling(choice)) {
+                                        continue;
+                                    }
+
+                                    t.displayKillerPersonalBestsInReferenceToN(choice);
+                                }
+
+                                break;
+                            }
                         }
 
-                        t.displayKillerWinstreaksInReferenceToN(choice);
                     }
 
                     break;
                 }
 
-                case 8: {
+                case 7: {
                     isChoiceNewKiller = true;
                     break;
                 }
