@@ -43,8 +43,8 @@ public:
     void setKiller(const std::string& k) { killer = k; }
 
     // display
-    void displayKillerWinstreak(const std::string& killerName) const noexcept;
-    void displayAllKillerInfo() const noexcept;
+    void displaySpecificKillerStats(const std::string& killerName) const noexcept;
+    void displayAllKillerStats() const noexcept;
     void displayKillerWinstreaksInReferenceToN(const int n) const noexcept;
     void displayKillerPersonalBestsInReferenceToN(const int n) const noexcept;
 

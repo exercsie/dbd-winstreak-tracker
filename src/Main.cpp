@@ -109,10 +109,10 @@ int main() {
             std::println("---------------------------------------");
             std::println("[CONSOLE] Selected killer: {}", killer);
             std::println("[CONSOLE] 1 - Start counting winstreak");
-            std::println("[CONSOLE] 2 - View winstreak data");
-            std::println("[CONSOLE] 3 - Reset data options");
-            std::println("[CONSOLE] 4 - Set data options");
-            std::println("[CONSOLE] 5 - Query data");
+            std::println("[CONSOLE] 2 - View {}'s stats", killer);
+            std::println("[CONSOLE] 3 - Reset stats options");
+            std::println("[CONSOLE] 4 - Set stats options");
+            std::println("[CONSOLE] 5 - Query stats");
             std::println("[CONSOLE] 6 - Choose a new killer");
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
@@ -130,7 +130,7 @@ int main() {
                 }
 
                 case 2: {
-                    t.displayKillerWinstreak(killer);
+                    t.displaySpecificKillerStats(killer);
                     break;
                 }
 
@@ -211,7 +211,7 @@ int main() {
                             case 2: {
                                 bool didAvoidSpecification{false};
                                 while(true) {
-                                    std::print("[CONSOLE] Enter a to set {}'s personal best to (type -1 to go back): ", killer);
+                                    std::print("[CONSOLE] Enter a number to set {}'s personal best (type -1 to go back): ", killer);
                                     std::cin >> choice;
                                     if(choice == -1) {
                                         std::println("[CONSOLE] {}'s personal best specification avoided successfully", killer);
@@ -259,7 +259,7 @@ int main() {
 
                         switch(choice) {
                             case 1: {
-                                t.displayAllKillerInfo();
+                                t.displayAllKillerStats();
                                 break;
                             }
 
