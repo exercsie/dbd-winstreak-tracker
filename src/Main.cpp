@@ -36,6 +36,13 @@ int main() {
         bool isChoiceNewKiller = false;
         std::print("[CONSOLE] Enter your killer: ");
         std::getline(std::cin, killer);
+
+        if(killer.empty()) {
+            std::println(std::cerr, "[ERROR] Please enter a killer");
+            continue;
+        }
+
+
         // replace every space with a hyphon to match file
         for(std::uint16_t i{}; i < killer.size(); ++i) {
             if(killer[i] == ' ') {
@@ -47,14 +54,15 @@ int main() {
         std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
         
         // check entered killer is actually a killer
+        
         t.setKiller(killer);
         t.buildKillerWinMap();
-
+        
         if(!t.isValidKiller()) {
             std::println(std::cerr, "[ERROR] {} does not exist. Example usage, \"The Terrifier\".", killer);
             continue;
         }
-
+        
         while(true) {
             if(isChoiceNewKiller) {
                 break;
@@ -64,14 +72,12 @@ int main() {
             std::println("[CONSOLE] Selected killer: {}", killer);
             std::println("[CONSOLE] 1 - Start counting winstreak");
             std::println("[CONSOLE] 2 - View winstreak data");
-            std::println("[CONSOLE] 3 - Reset winstreak");
-            std::println("[CONSOLE] 4 - Set amount of wins");
-            std::println("[CONSOLE] 5 - Set personal best");
-            std::println("[CONSOLE] 6 - Query data");
-            std::println("[CONSOLE] 7 - Choose a new killer");
+            std::println("[CONSOLE] 3 - Reset data options");
+            std::println("[CONSOLE] 4 - Set data options");
+            std::println("[CONSOLE] 5 - Query data");
+            std::println("[CONSOLE] 6 - Choose a new killer");
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
-            std::println("---------------------------------------");
 
             if(!inputHandling(choice, lowerBound, upperBound)) {
                 continue;
@@ -91,66 +97,114 @@ int main() {
                 }
 
                 case 3: {
-                    t.resetWinstreak();
+                    while(true) {
+                        std::println("---------------------------------------");
+                        std::println("[CONSOLE] 1 - Reset winstreak");
+                        std::println("[CONSOLE] 2 - Reset personal best");
+                        std::print("[CONSOLE] Enter an option (type -1 to go back): ");
+                        std::cin >> choice;
+                        if(choice == -1) {
+                            break;
+                        }
+
+                        if(!inputHandling(choice, 1, 2)) {
+                            continue;
+                        }
+
+                        switch(choice) {
+                            case 1: {
+                                t.resetWinstreak();
+                                break;
+                            }
+
+                            case 2: {
+                                t.resetPersonalBest();
+                                break;
+                            }
+                        }
+                    }
+
                     break;
                 }
 
                 case 4: {
-                    bool didAvoidSpecification{false};
                     while(true) {
-                        std::print("[CONSOLE] Enter number of wins to set {}'s winstreak to (type -1 to go back): ", killer);
+                        std::println("---------------------------------------");
+                        std::println("[CONSOLE] 1 - Set winstreak");
+                        std::println("[CONSOLE] 2 - Set personal best");
+                        std::print("[CONSOLE] Enter an option (type -1 to go back): ");
                         std::cin >> choice;
                         if(choice == -1) {
-                            std::println("[CONSOLE] {}'s winstreak specification avoided successfully", killer);
-                            didAvoidSpecification = true;
                             break;
                         }
 
-                        if(!inputHandling(choice)) {
+                        if(!inputHandling(choice, 1, 2)) {
                             continue;
                         }
 
-                        break;
-                    }
+                        switch(choice) {
+                            case 1: {
+                                bool didAvoidSpecification{false};
+                                while(true) {
+                                    std::print("[CONSOLE] Enter number of wins to set {}'s winstreak to (type -1 to go back): ", killer);
+                                    std::cin >> choice;
+                                    if(choice == -1) {
+                                        std::println("[CONSOLE] {}'s winstreak specification avoided successfully", killer);
+                                        didAvoidSpecification = true;
+                                        break;
+                                    }
 
-                    if(!didAvoidSpecification) {
-                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                        t.specifyKillerWins(choice);
-                        break;
+                                    if(!inputHandling(choice)) {
+                                        continue;
+                                    }
+
+                                    break;
+                                }
+
+                                if(!didAvoidSpecification) {
+                                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                    t.specifyKillerWins(choice);
+                                    break;
+                                }
+
+                                break;
+                            }
+
+                            case 2: {
+                                bool didAvoidSpecification{false};
+                                while(true) {
+                                    std::print("[CONSOLE] Enter a to set {}'s personal best to (type -1 to go back): ", killer);
+                                    std::cin >> choice;
+                                    if(choice == -1) {
+                                        std::println("[CONSOLE] {}'s personal best specification avoided successfully", killer);
+                                        didAvoidSpecification = true;
+                                        break;
+                                    }
+
+                                    if(!inputHandling(choice)) {
+                                        continue;
+                                    }
+
+                                    break;
+                                }
+
+                                if(!didAvoidSpecification) {
+                                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                    t.setPersonalBest(choice);
+                                    break;
+                                }
+
+                                break;
+                            }
+                        }
                     }
 
                     break;
                 }
 
                 case 5: {
-                    bool didAvoidSpecification{false};
                     while(true) {
-                        std::print("[CONSOLE] Enter a to set {}'s personal best to (type -1 to go back): ", killer);
-                        std::cin >> choice;
-                        if(choice == -1) {
-                            std::println("[CONSOLE] {}'s personal best specification avoided successfully", killer);
-                            didAvoidSpecification = true;
-                            break;
-                        }
-
-                        if(!inputHandling(choice)) {
-                            continue;
-                        }
-
-                        break;
-                    }
-
-                    if(!didAvoidSpecification) {
-                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                        t.setPersonalBest(choice);
-                        break;
-                    }
-
-                    break;
-                }
-
-                case 6: {
-                    while(true) {
+                        std::println("---------------------------------------");
                         std::println("[CONSOLE] 1 - View all killer's info");
                         std::println("[CONSOLE] 2 - View all killer's winstreaks >= a number");
                         std::println("[CONSOLE] 3 - View all killer's personal bests >= a number");
@@ -213,7 +267,7 @@ int main() {
                     break;
                 }
 
-                case 7: {
+                case 6: {
                     isChoiceNewKiller = true;
                     break;
                 }

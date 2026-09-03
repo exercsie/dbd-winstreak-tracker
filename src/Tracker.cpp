@@ -114,7 +114,9 @@ void Tracker::buildKillerWinMap() {
     }
     
     // update data
-    d = tracker.at(this->killer);
+    if(tracker.contains(this->killer)) {
+        d = tracker.at(this->killer);
+    }
 }
 
 void Tracker::mapUpdater() noexcept {
@@ -123,7 +125,7 @@ void Tracker::mapUpdater() noexcept {
 
 void Tracker::winstreakCounter() noexcept {
     std::string enter;
-    std::println("[CONSOLE] Hit enter to add one to {}'s winstreak, type 0 to exit", killer);
+    std::println("[CONSOLE] Hit enter to add one to {}'s winstreak, type 0 to save", killer);
     std::println("[CONSOLE] Wins: {}", d.wins);
     while(true) {
         std::getline(std::cin, enter);
@@ -137,9 +139,15 @@ void Tracker::winstreakCounter() noexcept {
             mapUpdater();
             updateFile();
         } else if(enter == "-") {
+            if(d.wins == 0) {
+                std::println(std::cerr, "[ERROR] Cannot decrement winstreak past 0!");
+                break;
+            }
+
             if(d.personalBest == d.wins) {
                 --d.personalBest;
             }
+
             --d.wins;
             std::println("[CONSOLE] Wins: {}", d.wins);
             mapUpdater();
@@ -177,6 +185,43 @@ void Tracker::resetWinstreak() noexcept {
         if(choice == 'y') {
             d.wins = 0;
             std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, d.wins);
+            
+            mapUpdater();
+            updateFile();
+            return;
+        }
+        
+        std::println(std::cerr, "[ERROR] Please enter [Y/n]");
+    }
+    
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+void Tracker::resetPersonalBest() noexcept {
+    if(d.personalBest == 0) {
+        std::println(std::cerr, "[ERROR] {}'s personal best is already at 0!", killer);
+        return;
+    }
+    
+    char choice;
+    while(true) {
+        std::print("[CONSOLE] Are you sure you want to reset {}'s personal best? [Y/n] ", killer);
+        std::cin >> choice;
+        if(std::cin.fail()) {
+            std::cin.clear();
+            std::println(std::cerr, "[ERROR] Please enter [Y/n]");
+            continue;
+        }
+        
+        choice = std::tolower(choice);
+        if(choice == 'n') {
+            std::println("[CONSOLE] {}'s personal best reset avoided successfully", killer);
+            return;
+        }
+        
+        if(choice == 'y') {
+            d.personalBest = 0;
+            std::println("[CONSOLE] {}'s personal best has been set to {}", killer, d.wins);
             
             mapUpdater();
             updateFile();

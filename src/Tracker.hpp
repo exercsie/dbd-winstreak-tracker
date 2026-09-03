@@ -36,6 +36,7 @@ public:
     void mapUpdater() noexcept;
     void winstreakCounter() noexcept;
     void resetWinstreak() noexcept;
+    void resetPersonalBest() noexcept;
     void updateFile();
     void specifyKillerWins(std::uint16_t w) noexcept;
     void setPersonalBest(std::uint16_t pb) noexcept;
