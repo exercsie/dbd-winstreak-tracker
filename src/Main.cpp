@@ -26,7 +26,7 @@ bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const s
 
 int main() {
     constexpr std::uint16_t lowerBound{1};
-    constexpr std::uint16_t upperBound{7};
+    constexpr std::uint16_t upperBound{8};
     std::string killer;
     int choice;
     Tracker t;
@@ -63,12 +63,13 @@ int main() {
             std::println("---------------------------------------");
             std::println("[CONSOLE] Selected killer: {}", killer);
             std::println("[CONSOLE] 1 - Start counting winstreak");
-            std::println("[CONSOLE] 2 - View winstreak");
+            std::println("[CONSOLE] 2 - View winstreak data");
             std::println("[CONSOLE] 3 - Reset winstreak");
             std::println("[CONSOLE] 4 - Set amount of wins");
-            std::println("[CONSOLE] 5 - View all killer's winstreaks");
-            std::println("[CONSOLE] 6 - View all killers with a winstreak >= a number");
-            std::println("[CONSOLE] 7 - Choose a new killer");
+            std::println("[CONSOLE] 5 - Set personal best");
+            std::println("[CONSOLE] 6 - View all killer's winstreaks");
+            std::println("[CONSOLE] 7 - View all killers with a winstreak >= a number");
+            std::println("[CONSOLE] 8 - Choose a new killer");
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
             std::println("---------------------------------------");
@@ -123,11 +124,38 @@ int main() {
                 }
 
                 case 5: {
-                    t.displayAllKillerWinstreaks();
+                    bool didAvoidSpecification{false};
+                    while(true) {
+                        std::print("[CONSOLE] Enter a to set {}'s personal best to (type -1 to go back): ", killer);
+                        std::cin >> choice;
+                        if(choice == -1) {
+                            std::println("[CONSOLE] {}'s personal best specification avoided successfully", killer);
+                            didAvoidSpecification = true;
+                            break;
+                        }
+
+                        if(!inputHandling(choice)) {
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    if(!didAvoidSpecification) {
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        t.setPersonalBest(choice);
+                        break;
+                    }
+
                     break;
                 }
 
                 case 6: {
+                    t.displayAllKillerWinstreaks();
+                    break;
+                }
+
+                case 7: {
                     while(true) {
                         std::print("[CONSOLE] Enter amount of wins to search for (type -1 to go back): ");
                         std::cin >> choice;
@@ -149,7 +177,7 @@ int main() {
                     break;
                 }
 
-                case 7: {
+                case 8: {
                     isChoiceNewKiller = true;
                     break;
                 }

@@ -6,10 +6,22 @@
 #include <filesystem>
 
 class Tracker {
+private:
+    const std::filesystem::path dbdWinTrackerDirectory = std::filesystem::path(std::getenv("HOME")) / ".config/tracker";
+    const std::filesystem::path dbdWinTrackerFile = dbdWinTrackerDirectory / "killer_win_info.txt";
+    std::string killer;
+    struct data {
+        std::uint16_t wins{};
+        std::uint16_t personalBest{};
+    };
+
+    std::unordered_map<std::string, data> tracker;
+    data d;
+
 public:
     // constructors
-    explicit Tracker(const std::string& k, std::uint16_t w) : killer(k), wins(w) {};
-    explicit Tracker(const std::string& k) : killer(k), wins(0) {};
+    explicit Tracker(const std::string& k, std::uint16_t w) : killer(k), d{w, 0} {};
+    explicit Tracker(const std::string& k) : killer(k), d{0, 0} {};
     explicit Tracker() = default;
 
     // destructor
@@ -21,11 +33,12 @@ public:
 
     // updaters
     void buildKillerWinMap();
-    void mapUpdater(std::unordered_map<std::string, std::uint16_t>&) noexcept;
+    void mapUpdater() noexcept;
     void winstreakCounter() noexcept;
     void resetWinstreak() noexcept;
     void updateFile();
     void specifyKillerWins(std::uint16_t w) noexcept;
+    void setPersonalBest(std::uint16_t pb) noexcept;
     void setKiller(const std::string& k) { killer = k; }
 
     // display
@@ -37,12 +50,6 @@ public:
     [[nodiscard]] bool isValidKiller() const { return tracker.contains(killer); }
 
     // getters
-    [[nodiscard]] std::unordered_map<std::string, std::uint16_t> getMap() const noexcept { return tracker; }
+    [[nodiscard]] std::unordered_map<std::string, data> getMap() const noexcept { return tracker; }
 
-private:
-    const std::filesystem::path dbdWinTrackerDirectory = std::filesystem::path(std::getenv("HOME")) / ".config/tracker";
-    const std::filesystem::path dbdWinTrackerFile = dbdWinTrackerDirectory / "killer_win_info.txt";
-    std::string killer;
-    std::uint16_t wins{};
-    std::unordered_map<std::string, std::uint16_t> tracker;
 };
