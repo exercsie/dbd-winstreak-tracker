@@ -6,22 +6,20 @@
 #include <print>
 #include <iostream>
 #include <limits>
+#include <expected>
 
-bool inputHandling(const int choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 65535) {
+std::expected<void, std::string> inputHandling(const int choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 65535) {
     if(std::cin.fail()) {
         std::cin.clear();
-        std::cin.ignore(1000, '\n');
-        std::println(std::cerr, "[ERROR] Please enter a number!");
-        return false;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        return std::unexpected("Please enter a number!");
     }
 
     if(choice < lowerBound || choice > upperBound) {
-        std::cin.clear();
-        std::println(std::cerr, "[ERROR] Please enter a number between {} and {}", lowerBound, upperBound);
-        return false;
+        return std::unexpected(std::format("Please enter a number between {} and {}", lowerBound, upperBound));
     }
 
-    return true;
+    return {};
 }
 
 void killerAliases(std::string& k) {
@@ -59,7 +57,6 @@ void killerAliases(std::string& k) {
     } else if(!k.starts_with("THE-")) {
         k = std::format("THE-{}", k);
     }
-
 }
 
 int main() {
@@ -118,7 +115,9 @@ int main() {
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
 
-            if(!inputHandling(choice, lowerBound, upperBound)) {
+            const std::expected result = inputHandling(choice, lowerBound, upperBound);
+            if(!result) {
+                std::println(std::cerr, "[ERROR] {}", result.error());
                 continue;
             }
 
@@ -150,7 +149,9 @@ int main() {
                             break;
                         }
 
-                        if(!inputHandling(choice, 1, 2)) {
+                        const std::expected result = inputHandling(choice, 1, 2);
+                        if(!result) {
+                            std::println(std::cerr, "[ERROR] {}", result.error());
                             continue;
                         }
 
@@ -181,7 +182,9 @@ int main() {
                             break;
                         }
 
-                        if(!inputHandling(choice, 1, 2)) {
+                        const std::expected result = inputHandling(choice, 1, 2);
+                        if(!result) {
+                            std::println(std::cerr, "[ERROR] {}", result.error());
                             continue;
                         }
 
@@ -197,7 +200,9 @@ int main() {
                                         break;
                                     }
 
-                                    if(!inputHandling(choice)) {
+                                    const std::expected result = inputHandling(choice);
+                                    if(!result) {
+                                        std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
                                     }
 
@@ -224,7 +229,9 @@ int main() {
                                         break;
                                     }
 
-                                    if(!inputHandling(choice)) {
+                                    const std::expected result = inputHandling(choice);
+                                    if(!result) {
+                                        std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
                                     }
 
@@ -258,7 +265,9 @@ int main() {
                             break;
                         }
 
-                        if(!inputHandling(choice, 1, 3)) {
+                        const std::expected result = inputHandling(choice, 1, 3);
+                        if(!result) {
+                            std::println(std::cerr, "[ERROR] {}", result.error());
                             continue;
                         }
 
@@ -276,7 +285,9 @@ int main() {
                                         break;
                                     }
 
-                                    if(!inputHandling(choice)) {
+                                    const std::expected result = inputHandling(choice);
+                                    if(!result) {
+                                        std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
                                     }
 
@@ -294,7 +305,9 @@ int main() {
                                         break;
                                     }
 
-                                    if(!inputHandling(choice)) {
+                                    const std::expected result = inputHandling(choice);
+                                    if(!result) {
+                                        std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
                                     }
 
@@ -304,7 +317,6 @@ int main() {
                                 break;
                             }
                         }
-
                     }
 
                     break;
@@ -315,9 +327,6 @@ int main() {
                     break;
                 }
             }
-
         }
     }
-
-
 }

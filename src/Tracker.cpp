@@ -90,14 +90,11 @@ void Tracker::buildKillerWinMap() {
 
     while(std::getline(winInfoFile, stream)) {
         const std::size_t delimiter = stream.find('|');
-
-        // reach end of line
-        if(delimiter == std::string::npos) {
+        if(delimiter == std::string::npos) { // reach end of line
             continue;
         }
 
         const std::size_t secondDelimiter = stream.find('|', delimiter + 1);
-
         if(secondDelimiter == std::string::npos) {
             continue;
         }
@@ -105,7 +102,6 @@ void Tracker::buildKillerWinMap() {
         std::string killer = stream.substr(0, delimiter);
         std::uint16_t wins = std::stoi(stream.substr(delimiter + 1, secondDelimiter - delimiter - 1));
         std::uint16_t pb = std::stoi(stream.substr(secondDelimiter + 1));
-
         if(!killer.empty() && killer.back() == ' ') {
             killer.pop_back();
         }
@@ -139,6 +135,7 @@ void Tracker::winstreakCounter() noexcept {
 
             mapUpdater();
             updateFile();
+
         } else if(enter == "-") {
             if(d.wins == 0) {
                 std::println(std::cerr, "[ERROR] Cannot decrement winstreak past 0!");
@@ -240,7 +237,6 @@ void Tracker::resetPersonalBest() noexcept {
 
 void Tracker::updateFile() {
     std::ofstream trackerFile(dbdWinTrackerFile);
-
     if(!trackerFile) {
         throw std::runtime_error("Cannot open killer_win_info.txt");
     }
