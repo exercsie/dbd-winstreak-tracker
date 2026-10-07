@@ -164,7 +164,7 @@ int main() {
                     }
 
                     if(ImGui::BeginPopupModal("Confirm PB reset", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::Text(std::format("Reset {}'s Personal Best? (This resets current wins)", selectedKiller).c_str());
+                        ImGui::Text(std::format("Reset {}'s personal best? (This resets current wins)", selectedKiller).c_str());
                         if(ImGui::Button("Yes")) {
                             const std::expected r = t.resetPersonalBest();
                             if(!r) {
@@ -179,6 +179,68 @@ int main() {
                         ImGui::SameLine();
                         if(ImGui::Button("No")) {
                             error.clear();
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::EndPopup();
+                    }
+
+                    break;
+                }
+
+                case GUI::UI::setStats: {
+                    static int tempWins{};
+                    if(ImGui::Button("Set winstreak")) {
+                        ImGui::OpenPopup("Enter winstreak value");
+                    }
+
+                    if(ImGui::BeginPopupModal("Enter winstreak value", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::InputInt("Wins", &tempWins);
+                        if(ImGui::Button("Apply")) {
+                            const std::expected r = t.setWins(tempWins);
+                            if(!r) {
+                                tempWins = 0;
+                                error = r.error();
+                            } else {
+                                error.clear();
+                            }
+
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SameLine();
+
+                        if(ImGui::Button("Cancel")) {
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::EndPopup();
+                    }
+
+                    ImGui::SameLine();
+
+                    if(ImGui::Button("Set personal best")) {
+                        ImGui::OpenPopup("Enter personal best value");
+                    }
+
+                    static int tempPB{};
+                    if(ImGui::BeginPopupModal("Enter personal best value", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::InputInt("Wins", &tempPB);
+                        if(ImGui::Button("Apply")) {
+                            const std::expected r = t.setPersonalBest(tempPB);
+                            if(!r) {
+                                tempPB = 0;
+                                error = r.error();
+                            } else {
+                                error.clear();
+                            }
+
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SameLine();
+
+                        if(ImGui::Button("Cancel")) {
                             ImGui::CloseCurrentPopup();
                         }
 

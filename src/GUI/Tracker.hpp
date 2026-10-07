@@ -35,11 +35,11 @@ public:
     // Updaters
     [[nodiscard]] static std::string killerNormalisation(std::string k);
     void incrementWins();
-    std::expected<void, std::string> decrementWins();
-    std::expected<void, std::string> resetWinstreak();
-    std::expected<void, std::string> resetPersonalBest();
-    void specifyKillerWins(std::uint16_t w);
-    void setPersonalBest(std::uint16_t pb);
+    [[nodiscard]] std::expected<void, std::string> decrementWins();
+    [[nodiscard]] std::expected<void, std::string> resetWinstreak();
+    [[nodiscard]] std::expected<void, std::string> resetPersonalBest();
+    [[nodiscard]] std::expected<void, std::string> setWins(int w);
+    [[nodiscard]] std::expected<void, std::string> setPersonalBest(int pb);
     void setKiller(const std::string& k) { killer = k; }
 
     // Display logic

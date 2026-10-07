@@ -232,33 +232,40 @@ std::expected<void, std::string> Tracker::resetPersonalBest() {
     return {};
 }
 
-
-void Tracker::specifyKillerWins(std::uint16_t w) {
-    if(d.personalBest < w) {
-        d.wins = w;
-        d.personalBest = w;
-        mapUpdater();
-        updateFile();
-        return;
+std::expected<void, std::string> Tracker::setWins(int w) {
+    if(w < 0 || w > 65535) {
+        return std::unexpected("Wins vaue must be between 0 and 65535");
+    }
+    
+    const std::uint16_t newWins = static_cast<std::uint16_t>(w);
+    if(d.personalBest < newWins) {
+        d.personalBest = newWins;
     }
 
-    d.wins = w;
+    d.wins = newWins;
     mapUpdater();
     updateFile();
+    return {};
 }
 
-void Tracker::setPersonalBest(std::uint16_t pb) {
-    if(d.wins > pb) {
-        d.wins = pb;
-        d.personalBest = pb;
-        mapUpdater();
-        updateFile();
-        return;
+std::expected<void, std::string> Tracker::setPersonalBest(int pb) {
+    if(pb < 0 || pb > 65535) {
+        return std::unexpected("PB value must be between 0 and 65535");
     }
 
-    d.personalBest = pb;
+    const std::uint16_t newPB = static_cast<std::uint16_t>(pb);
+    if(d.wins > newPB) {
+        d.wins = newPB;
+        d.personalBest = newPB;
+        mapUpdater();
+        updateFile();
+        return {};
+    }
+
+    d.personalBest = newPB;
     mapUpdater();
     updateFile();
+    return {};
 }
 
 /*void Tracker::displaySpecificKillerStats(const std::string& killerName) const noexcept {
