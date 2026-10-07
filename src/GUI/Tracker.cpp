@@ -1,13 +1,13 @@
 #include "Tracker.hpp"
 
-#include <cctype>            // std::tolower
+#include <algorithm>         // std::transform
+#include <cctype>            // ::toupper
 #include <cstddef>           // std::size_t
 #include <cstdint>           // std::uint16_t
+#include <expected>          // std::expected, std::unexpected
 #include <filesystem>        // std::filesystem::exists, std::filesystem::create_directories
+#include <format>            // std::format
 #include <fstream>           // std::ifstream, std::ofstream
-#include <iostream>          // std::cin, std::cerr, std::streamsize
-#include <limits>            // std::numeric_limits, ::max
-#include <print>             // std::print, std::println
 #include <stdexcept>         // std::runtime_error
 #include <string>            // std::string, std::getline, std::stoi
 
@@ -122,122 +122,6 @@ void Tracker::mapUpdater() noexcept {
     tracker[killer] = d;
 }
 
-void Tracker::winstreakCounter() noexcept {
-    std::string enter;
-    std::println("---------------------------------------");
-    std::println("[CONSOLE] Hit enter to add one to {}'s winstreak, type 0 to save", killer);
-    std::print("[CONSOLE] Wins: {} ", d.wins);
-    while(true) {
-        std::getline(std::cin, enter);
-        if(enter.empty()) {
-            ++d.wins;
-            std::print("[CONSOLE] Wins: {} ", d.wins);
-            if(d.personalBest < d.wins) {
-                d.personalBest = d.wins;
-            }
-
-            mapUpdater();
-            updateFile();
-
-        } else if(enter == "-") {
-            if(d.wins == 0) {
-                std::println(std::cerr, "[ERROR] Cannot decrement winstreak past 0!");
-                break;
-            }
-
-            if(d.personalBest == d.wins) {
-                --d.personalBest;
-            }
-
-            --d.wins;
-            std::print("[CONSOLE] Wins: {} ", d.wins);
-            mapUpdater();
-            updateFile();
-        } else {
-            break;
-        }
-    }
-
-    std::println("[CONSOLE] {}'s winstreak is now {}", killer, d.wins);
-}
-
-void Tracker::resetWinstreak() noexcept {
-    if(d.wins == 0) {
-        std::println(std::cerr, "[ERROR] {}'s wins are already at 0!", killer);
-        return;
-    }
-    
-    char choice;
-    while(true) {
-        std::println("---------------------------------------");
-        std::print("[CONSOLE] Are you sure you want to reset {}'s winstreak? [Y/n] ", killer);
-        std::cin >> choice;
-        if(std::cin.fail()) {
-            std::cin.clear();
-            std::println(std::cerr, "[ERROR] Please enter [Y/n]");
-            continue;
-        }
-        
-        choice = std::tolower(choice);
-        if(choice == 'n') {
-            std::println("[CONSOLE] {}'s winstreak reset avoided successfully", killer);
-            return;
-        }
-        
-        if(choice == 'y') {
-            d.wins = 0;
-            std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, d.wins);
-            
-            mapUpdater();
-            updateFile();
-            return;
-        }
-        
-        std::println(std::cerr, "[ERROR] Please enter [Y/n]");
-    }
-    
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
-void Tracker::resetPersonalBest() noexcept {
-    if(d.personalBest == 0) {
-        std::println(std::cerr, "[ERROR] {}'s personal best is already at 0!", killer);
-        return;
-    }
-    
-    char choice;
-    while(true) {
-        std::println("---------------------------------------");
-        std::print("[CONSOLE] Are you sure you want to reset {}'s personal best? This will also reset wins [Y/n] ", killer);
-        std::cin >> choice;
-        if(std::cin.fail()) {
-            std::cin.clear();
-            std::println(std::cerr, "[ERROR] Please enter [Y/n]");
-            continue;
-        }
-        
-        choice = std::tolower(choice);
-        if(choice == 'n') {
-            std::println("[CONSOLE] {}'s personal best reset avoided successfully", killer);
-            return;
-        }
-        
-        if(choice == 'y') {
-            d.personalBest = 0;
-            d.wins = 0;
-            std::println("[CONSOLE] {}'s personal best  and wins have been set to {}", killer, d.personalBest);
-            
-            mapUpdater();
-            updateFile();
-            return;
-        }
-        
-        std::println(std::cerr, "[ERROR] Please enter [Y/n]");
-    }
-    
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
 void Tracker::updateFile() {
     std::ofstream trackerFile(dbdWinTrackerFile);
     if(!trackerFile) {
@@ -250,39 +134,132 @@ void Tracker::updateFile() {
     }
 }
 
-void Tracker::specifyKillerWins(std::uint16_t w) noexcept {
+std::string Tracker::killerNormalisation(std::string killer) {
+    // Replace every space with a -
+    for(std::uint16_t i{}; i < killer.size(); ++i) {
+        if(killer[i] == ' ') {
+            killer[i] = '-';
+        }
+    }
+
+    // Convert all chars to uppercase
+    std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
+
+    // Killer aliases
+    const std::unordered_map<std::string, std::string> aliases {
+        {"BUBBA", "THE-CANNIBAL"},
+        {"LEATHERFACE", "THE-CANNIBAL"},
+        {"LEATHER-FACE", "THE-CANNIBAL"},
+        {"BILLY", "THE-HILLBILLY"},
+        {"DEMO", "THE-DEMOGORGEN"},
+        {"WESKER", "THE-MASTERMIND"},
+        {"MYERS", "THE-SHAPE"},
+        {"MICHAEL-MYERS", "THE-SHAPE"},
+        {"DOC", "THE-DOCTOR"},
+        {"FREDDY", "THE-NIGHTMARE"},
+        {"FREDDY-KRUEGER", "THE-NIGHTMARE"},
+        {"GHOSTFACE", "THE-GHOST-FACE"},
+        {"SLINGER", "THE-DEATHSLINGER"},
+        {"PYRAMID-HEAD", "THE-EXECUTIONER"},
+        {"PYRAMIDHEAD", "THE-EXECUTIONER"},
+        {"PINHEAD", "THE-CENOBITE"},
+        {"PIN-HEAD", "THE-CENOBITE"},
+        {"SADAKO", "THE-ONRYO"},
+        {"XENO", "THE-XENOMORPH"},
+        {"CHUCKY", "THE-GOOD-GUY"},
+        {"VECNA", "THE-LICH"},
+        {"DRACULA", "THE-DARK-LORD"},
+        {"DRAC", "THE-DARK-LORD"},
+        {"KEN", "THE-GHOUL"},
+        {"KEN-KANEKI", "THE-GHOUL"},
+        {"SPRINGTRAP", "THE-ANIMATRONIC"}
+    };
+
+    if(const auto it = aliases.find(killer); it != aliases.end()) {
+        killer = it->second;
+    } else if(!killer.starts_with("THE-")) {
+        killer = std::format("THE-{}", killer);
+    }
+}
+
+void Tracker::incrementWins() {
+    ++d.wins;
+    if(d.personalBest < d.wins) {
+        d.personalBest = d.wins;
+    }
+
+    mapUpdater();
+    updateFile();
+}
+
+std::expected<void, std::string> Tracker::decrementWins() {
+    if(d.wins == 0) {
+        return std::unexpected("Winstreak cannot go below 0!");
+    }
+
+    if(d.personalBest == d.wins) {
+        --d.personalBest;
+    }
+
+    --d.wins;
+    mapUpdater();
+    updateFile();
+    return {};
+}
+
+std::expected<void, std::string> Tracker::resetWinstreak() {
+    if(d.wins == 0) {
+        return std::unexpected(std::format("{}'s winstreak is already at 0!", killer));
+    }
+    
+    d.wins = 0;
+    mapUpdater();
+    updateFile();
+    return {};
+}
+
+std::expected<void, std::string> Tracker::resetPersonalBest() {
+    if(d.personalBest == 0) {
+        return std::unexpected(std::format("{}'s personal best is already at 0!", killer));
+    }
+    
+    d.wins = 0;
+    d.personalBest = 0;
+    mapUpdater();
+    updateFile();
+    return {};
+}
+
+
+void Tracker::specifyKillerWins(std::uint16_t w) {
     if(d.personalBest < w) {
         d.wins = w;
         d.personalBest = w;
         mapUpdater();
         updateFile();
-        std::println("[CONSOLE] {}'s winstreak and personal best has been set to {}", killer, w);
         return;
     }
 
     d.wins = w;
     mapUpdater();
     updateFile();
-    std::println("[CONSOLE] {}'s winstreak has been set to {}", killer, d.wins);
 }
 
-void Tracker::setPersonalBest(std::uint16_t pb) noexcept {
+void Tracker::setPersonalBest(std::uint16_t pb) {
     if(d.wins > pb) {
         d.wins = pb;
         d.personalBest = pb;
         mapUpdater();
         updateFile();
-        std::println("[CONSOLE] {}'s personal best and winstreak has been set to: {}", killer, pb);
         return;
     }
 
     d.personalBest = pb;
     mapUpdater();
     updateFile();
-    std::println("[CONSOLE] {}'s personal best has been set to: {}", killer, pb);
 }
 
-void Tracker::displaySpecificKillerStats(const std::string& killerName) const noexcept {
+/*void Tracker::displaySpecificKillerStats(const std::string& killerName) const noexcept {
     for(const auto& [killer, data] : tracker) {
         if(killer == killerName) {
             std::println("---------------------------------------");
@@ -332,4 +309,4 @@ void Tracker::displayKillerPersonalBestsInReferenceToN(const int n) const noexce
         std::println("---------------------------------------");
         std::println("[CONSOLE] No results found!");
     }
-}
+}*/
