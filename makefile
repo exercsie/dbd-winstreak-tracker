@@ -4,12 +4,13 @@ GUI_FLAGS = -I${IMGUI} -I${IMGUI}/backends
 
 # CLI version
 TRACKER_FILES = \
-	src/Main.cpp \
-	src/Tracker.cpp
+	src/CLI/MainCLI.cpp \
+	src/CLI/TrackerCLI.cpp
 
 # GUI version
 MYGUI_FILES = \
-	src/Gui.cpp
+	src/GUI/Gui.cpp \
+	src/GUI/Tracker.cpp
 
 IMGUI_FILES = \
 	$(IMGUI)/imgui.cpp \

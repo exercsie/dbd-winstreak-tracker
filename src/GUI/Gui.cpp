@@ -1,6 +1,6 @@
-#include "../Dependencies/imgui/imgui.h"
-#include "../Dependencies/imgui/backends/imgui_impl_glfw.h"
-#include "../Dependencies/imgui/backends/imgui_impl_opengl3.h"
+#include "../../Dependencies/imgui/imgui.h"
+#include "../../Dependencies/imgui/backends/imgui_impl_glfw.h"
+#include "../../Dependencies/imgui/backends/imgui_impl_opengl3.h"
 #include "Gui.hpp"
 
 #include <cstdint>          // std::uint16_t
@@ -48,9 +48,10 @@ int main() {
         
         ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         ImGui::Text("Welcome to dbd winstreak tracker!");
+        ImGui::Text("Enter your killer: ");
         
         static char buffer[128]{};
-        ImGui::InputText("Killer", buffer, sizeof(buffer));
+        ImGui::InputText("##", buffer, sizeof(buffer));
         
         const std::string killerName = buffer;
         const bool hasKiller = !killerName.empty();

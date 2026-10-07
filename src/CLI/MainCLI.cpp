@@ -1,5 +1,5 @@
-#include "Tracker.hpp"
-#include "Main.hpp"
+#include "TrackerCLI.hpp"
+#include "MainCLI.hpp"
 
 #include <algorithm>         // std::transform
 #include <cctype>            // ::toupper
