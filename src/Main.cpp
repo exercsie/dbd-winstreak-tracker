@@ -1,14 +1,18 @@
 #include "Tracker.hpp"
+#include "Main.hpp"
 
-#include <unordered_map>
-#include <string>
-#include <cstdint>
-#include <print>
-#include <iostream>
-#include <limits>
-#include <expected>
+#include <algorithm>         // std::transform
+#include <cctype>            // ::toupper
+#include <cstdint>           // std::uint16_t
+#include <expected>          // std::expected, std::unexpected
+#include <format>            // std::format
+#include <iostream>          // std;:cin, std::cerr, std::streamsize
+#include <limits>            // std::numeric_limits, ::max
+#include <print>             // std::print, std::println
+#include <string>            // std::string, std::getline
+#include <unordered_map>     // std::unordered_map
 
-std::expected<void, std::string> inputHandling(const int choice, const std::uint16_t lowerBound = 0, const std::uint16_t upperBound = 65535) {
+std::expected<void, std::string> Menu::inputHandling(const int choice, const std::uint16_t lowerBound, const std::uint16_t upperBound) {
     if(std::cin.fail()) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -22,7 +26,7 @@ std::expected<void, std::string> inputHandling(const int choice, const std::uint
     return {};
 }
 
-void killerAliases(std::string& k) {
+void Menu::killerAliases(std::string& k) noexcept {
     const std::unordered_map<std::string, std::string> aliases {
         {"BUBBA", "THE-CANNIBAL"},
         {"LEATHERFACE", "THE-CANNIBAL"},
@@ -60,6 +64,7 @@ void killerAliases(std::string& k) {
 }
 
 int main() {
+    Menu m;
     constexpr std::uint16_t lowerBound{0};
     constexpr std::uint16_t upperBound{6};
     std::string killer;
@@ -87,7 +92,7 @@ int main() {
         // convert killer's name to uppercase for killer_win_info.txt
         std::transform(killer.begin(), killer.end(), killer.begin(), ::toupper);
         
-        killerAliases(killer);
+        m.killerAliases(killer);
         
         t.setKiller(killer);
         t.buildKillerWinMap();
@@ -115,7 +120,7 @@ int main() {
             std::print("[CONSOLE] Choose an option: ");
             std::cin >> choice;
 
-            const std::expected result = inputHandling(choice, lowerBound, upperBound);
+            const std::expected result = m.inputHandling(choice, lowerBound, upperBound);
             if(!result) {
                 std::println(std::cerr, "[ERROR] {}", result.error());
                 continue;
@@ -149,7 +154,7 @@ int main() {
                             break;
                         }
 
-                        const std::expected result = inputHandling(choice, 1, 2);
+                        const std::expected result = m.inputHandling(choice, 1, 2);
                         if(!result) {
                             std::println(std::cerr, "[ERROR] {}", result.error());
                             continue;
@@ -182,7 +187,7 @@ int main() {
                             break;
                         }
 
-                        const std::expected result = inputHandling(choice, 1, 2);
+                        const std::expected result = m.inputHandling(choice, 1, 2);
                         if(!result) {
                             std::println(std::cerr, "[ERROR] {}", result.error());
                             continue;
@@ -200,7 +205,7 @@ int main() {
                                         break;
                                     }
 
-                                    const std::expected result = inputHandling(choice);
+                                    const std::expected result = m.inputHandling(choice);
                                     if(!result) {
                                         std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
@@ -229,7 +234,7 @@ int main() {
                                         break;
                                     }
 
-                                    const std::expected result = inputHandling(choice);
+                                    const std::expected result = m.inputHandling(choice);
                                     if(!result) {
                                         std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
@@ -265,7 +270,7 @@ int main() {
                             break;
                         }
 
-                        const std::expected result = inputHandling(choice, 1, 3);
+                        const std::expected result = m.inputHandling(choice, 1, 3);
                         if(!result) {
                             std::println(std::cerr, "[ERROR] {}", result.error());
                             continue;
@@ -285,7 +290,7 @@ int main() {
                                         break;
                                     }
 
-                                    const std::expected result = inputHandling(choice);
+                                    const std::expected result = m.inputHandling(choice);
                                     if(!result) {
                                         std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;
@@ -305,7 +310,7 @@ int main() {
                                         break;
                                     }
 
-                                    const std::expected result = inputHandling(choice);
+                                    const std::expected result = m.inputHandling(choice);
                                     if(!result) {
                                         std::println(std::cerr, "[ERROR] {}", result.error());
                                         continue;

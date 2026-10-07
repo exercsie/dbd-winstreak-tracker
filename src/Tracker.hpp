@@ -1,9 +1,11 @@
 #pragma once
 
-#include <cstdint>
-#include <unordered_map>
-#include <string>
-#include <filesystem>
+#include <cstdint>          // std::uint16_t
+#include <cstdlib>          // std::getenv
+#include <filesystem>       // std::filesystem::path
+#include <fstream>          // std::ofstream, std::ifstream
+#include <string>           // std::string
+#include <unordered_map>    // std::unordered_map
 
 class Tracker {
 private:
@@ -19,19 +21,19 @@ private:
     data d;
 
 public:
-    // constructors
+    // Constructors
     explicit Tracker(const std::string& k, std::uint16_t w) : killer(k), d{w, 0} {};
     explicit Tracker(const std::string& k) : killer(k), d{0, 0} {};
     explicit Tracker() = default;
 
-    // destructor
+    // Destructor
     ~Tracker() noexcept = default;
     
-    // file
+    // File logic
     [[nodiscard]] std::ifstream fileCreator();
     void populateFile(std::ofstream&) noexcept;
 
-    // updaters
+    // Updaters
     void buildKillerWinMap();
     void mapUpdater() noexcept;
     void winstreakCounter() noexcept;
@@ -42,15 +44,15 @@ public:
     void setPersonalBest(std::uint16_t pb) noexcept;
     void setKiller(const std::string& k) { killer = k; }
 
-    // display
+    // Display logic
     void displaySpecificKillerStats(const std::string& killerName) const noexcept;
     void displayAllKillerStats() const noexcept;
     void displayKillerWinstreaksInReferenceToN(const int n) const noexcept;
     void displayKillerPersonalBestsInReferenceToN(const int n) const noexcept;
 
-    // checkers
+    // Checker
     [[nodiscard]] bool isValidKiller() const { return tracker.contains(killer); }
 
-    // getters
+    // Getter
     [[nodiscard]] std::unordered_map<std::string, data> getMap() const noexcept { return tracker; }
 };

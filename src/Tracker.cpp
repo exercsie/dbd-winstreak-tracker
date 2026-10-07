@@ -1,12 +1,15 @@
 #include "Tracker.hpp"
 
-#include <iostream>
-#include <unordered_map>
-#include <string>
-#include <cstdint>
-#include <print>
-#include <fstream>
-#include <algorithm>
+#include <cctype>            // std::tolower
+#include <cstddef>           // std::size_t
+#include <cstdint>           // std::uint16_t
+#include <filesystem>        // std::filesystem::exists, std::filesystem::create_directories
+#include <fstream>           // std::ifstream, std::ofstream
+#include <iostream>          // std::cin, std::cerr, std::streamsize
+#include <limits>            // std::numeric_limits, ::max
+#include <print>             // std::print, std::println
+#include <stdexcept>         // std::runtime_error
+#include <string>            // std::string, std::getline, std::stoi
 
 std::ifstream Tracker::fileCreator() {
     if(!std::filesystem::exists(dbdWinTrackerDirectory)) {
