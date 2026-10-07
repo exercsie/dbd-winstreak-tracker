@@ -2,6 +2,7 @@
 #include "../../Dependencies/imgui/backends/imgui_impl_glfw.h"
 #include "../../Dependencies/imgui/backends/imgui_impl_opengl3.h"
 #include "Gui.hpp"
+#include "Tracker.hpp"
 
 #include <cstdint>          // std::uint16_t
 #include <expected>         // std::expected, std::unexpected
@@ -34,6 +35,10 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
+    Tracker t;
+    std::string error;
+    std::string selectedKiller;
+    bool killerSelected = false;
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -51,33 +56,50 @@ int main() {
         ImGui::Text("Enter your killer: ");
         
         static char buffer[128]{};
-        ImGui::InputText("##", buffer, sizeof(buffer));
+        if(ImGui::InputText("##", buffer, sizeof(buffer))) {
+            killerSelected = false;
+        }
         
-        const std::string killerName = buffer;
-        const bool hasKiller = !killerName.empty();
-
-        ImGui::Text("Selected killer: %s", hasKiller ? killerName.c_str() : "none");
-        ImGui::Separator();
-
         static std::optional<GUI::UI> button;
-        if(!hasKiller) {
+
+        if(ImGui::Button("Select killer")) {
+            t.setKiller(t.killerNormalisation(buffer));
+            t.buildKillerWinMap();
+            killerSelected = t.isValidKiller();
+            if(killerSelected) {
+                selectedKiller = t.killerNormalisation(buffer);
+                // Remove prior error if killer name was entered incorrectly
+                error.clear();
+            } else {
+                error = std::format("{} does not exist. Example: \"The Terrifier\".", buffer);
+            }
+        }
+
+        if(!killerSelected) {
             button.reset();
         }
 
-        if(hasKiller) {
+        if(!error.empty()) {
+            ImGui::TextColored(ImVec4(1, .3f, .3f, 1), "%s", error.c_str());
+        }
+
+        ImGui::Text("Selected killer: %s", killerSelected ? selectedKiller.c_str() : "none");
+        ImGui::Separator();
+
+        if(killerSelected) {
             if(ImGui::Button("Winstreak Counter", ImVec2(-1, 0))) {
                 button = GUI::UI::counter;
             }
     
-            if(ImGui::Button(std::format("View {}'s stats", killerName).c_str(), ImVec2(-1, 0))) {
+            if(ImGui::Button(std::format("View {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
                 button = GUI::UI::viewStats;
             }
     
-            if(ImGui::Button(std::format("Reset {}'s stats", killerName).c_str(), ImVec2(-1, 0))) {
+            if(ImGui::Button(std::format("Reset {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
                 button = GUI::UI::resetStats;
             }
     
-            if(ImGui::Button(std::format("Set {}'s stats", killerName).c_str(), ImVec2(-1, 0))) {
+            if(ImGui::Button(std::format("Set {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
                 button = GUI::UI::setStats;
             }
     
@@ -89,19 +111,19 @@ int main() {
         if(button) {
             switch(*button) {
                 case GUI::UI::counter: {
-                    static std::uint16_t counter{};
+                    ImGui::Text("Wins: %d PB: %d", t.getWins(), t.getPersonalBest());
                     if(ImGui::Button("+1")) {
-                        ++counter;
-                        std::println("Counter: {}", counter);
+                        t.incrementWins();
+                        if(!error.empty()) {
+                            error.clear();
+                        }
                     }
-    
+
+                    ImGui::SameLine();
                     if(ImGui::Button("-1")) {
-                        const auto result = g.inputHandling(counter, 0, "Cannot go past zero!");
-                        if(!result) {
-                            std::println("{}", result.error());
-                        } else {
-                            --counter;
-                            std::println("Counter: {}", counter);
+                        const std::expected r = t.decrementWins();
+                        if(!r) {
+                            error = r.error();
                         }
                     }
     
@@ -109,7 +131,10 @@ int main() {
                 }
     
                 case GUI::UI::viewStats: {
-                    ImGui::Text(std::format("Killer: {}\nWins: 0\nPB: 2", killerName).c_str());
+                    if(!error.empty()) {
+                        error.clear();
+                    }
+                    ImGui::Text(std::format("Killer: {}\nWins: {}\nPB: {}", selectedKiller, t.getWins(), t.getPersonalBest()).c_str());
                     break;
                 }
             }

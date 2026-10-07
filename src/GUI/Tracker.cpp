@@ -180,6 +180,8 @@ std::string Tracker::killerNormalisation(std::string killer) {
     } else if(!killer.starts_with("THE-")) {
         killer = std::format("THE-{}", killer);
     }
+
+    return killer;
 }
 
 void Tracker::incrementWins() {
