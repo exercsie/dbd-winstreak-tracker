@@ -12,14 +12,6 @@
 #include <print>            // std::println
 #include <string>           // std::string
 
-std::expected<void, std::string> GUI::inputHandling(const int firstParam, const int secondParam, const std::string& errorMsg) {
-    if(firstParam == secondParam) {
-        return std::unexpected(std::format("{}", errorMsg));
-    }
-
-    return {};
-}
-
 int main() {
     GUI g;
     glfwInit();
@@ -49,7 +41,7 @@ int main() {
         ImVec2 displaySize = ImGui::GetIO().DisplaySize;
 
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(500.0f, displaySize.y), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(550.0f, displaySize.y), ImGuiCond_Always);
         
         ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         ImGui::Text("Welcome to dbd winstreak tracker!");
@@ -93,18 +85,22 @@ int main() {
     
             if(ImGui::Button(std::format("View {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
                 button = GUI::UI::viewStats;
+                error.clear();
             }
     
             if(ImGui::Button(std::format("Reset {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
                 button = GUI::UI::resetStats;
+                error.clear();
             }
     
             if(ImGui::Button(std::format("Set {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
                 button = GUI::UI::setStats;
+                error.clear();
             }
     
             if(ImGui::Button("Query stats", ImVec2(-1, 0))) {
                 button = GUI::UI::query;
+                error.clear();
             }
         }
         
@@ -131,10 +127,64 @@ int main() {
                 }
     
                 case GUI::UI::viewStats: {
-                    if(!error.empty()) {
-                        error.clear();
-                    }
                     ImGui::Text(std::format("Killer: {}\nWins: {}\nPB: {}", selectedKiller, t.getWins(), t.getPersonalBest()).c_str());
+                    break;
+                }
+
+                case GUI::UI::resetStats: {
+                    if(ImGui::Button("Reset winstreak")) {
+                        ImGui::OpenPopup("Confirm winstreak reset");
+                    }
+
+                    ImGui::SameLine();
+                    if(ImGui::Button("Reset personal best")) {
+                        ImGui::OpenPopup("Confirm PB reset");
+                    }
+
+                    if(ImGui::BeginPopupModal("Confirm winstreak reset", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text(std::format("Reset {}'s winstreak?", selectedKiller).c_str());
+                        if(ImGui::Button("Yes")) {
+                            const std::expected r = t.resetWinstreak();
+                            if(!r) {
+                                error = r.error();
+                            } else {
+                                error.clear();
+                            }
+
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SameLine();
+                        if(ImGui::Button("No")) {
+                            error.clear();
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::EndPopup();
+                    }
+
+                    if(ImGui::BeginPopupModal("Confirm PB reset", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                        ImGui::Text(std::format("Reset {}'s Personal Best? (This resets current wins)", selectedKiller).c_str());
+                        if(ImGui::Button("Yes")) {
+                            const std::expected r = t.resetPersonalBest();
+                            if(!r) {
+                                error = r.error();
+                            } else {
+                                error.clear();
+                            }
+
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SameLine();
+                        if(ImGui::Button("No")) {
+                            error.clear();
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::EndPopup();
+                    }
+
                     break;
                 }
             }

@@ -19,7 +19,4 @@ public:
 
     // Destructor
     ~GUI() = default;
-
-    // Input Handling
-    [[nodiscard]] std::expected<void, std::string> inputHandling(const int firstParam, const int secondParam, const std::string& errorMsg);
 };
