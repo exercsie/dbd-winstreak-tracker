@@ -5,7 +5,7 @@
 - [GLFW](https://www.glfw.org/): creates window.
 - OpenGL: renders GUI.
 
-# Install GLFW and OpenGL files:
+## Install GLFW and OpenGL files:
 ### Fedora
 ```
 sudo dnf install glfw-devel mesa-libGL-devel
@@ -17,16 +17,29 @@ sudo pacman -S glfw mesa
 ```
 
 ## Build
+### CLI
 ```
 git clone --recurse-submodules https://github.com/exercsie/dbd-winstreak-tracker
 cd dbd-winstreak-tracker
-make
+make trackerCLI
+```
+
+### GUI
+```
+git clone --recurse-submodules https://github.com/exercsie/dbd-winstreak-tracker
+cd dbd-winstreak-tracker
+make trackerGUI
 ```
 
 ## Install
+### CLI
 ```
-cd Build
-sudo cp tracker /usr/local/bin
+sudo cp Build/trackerCLI /usr/local/bin
 ```
 
-Now type, "tracker" in any directory to run the program.
+### GUI 
+```
+sudo cp Build/trackerGUI /usr/local/bin
+```
+
+**Now type "trackerCLI" or "trackerGUI" in any directory to run the program.**
