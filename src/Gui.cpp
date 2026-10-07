@@ -7,6 +7,7 @@
 #include <expected>         // std::expected, std::unexpected
 #include <format>           // std::format
 #include <GLFW/glfw3.h>     // gl apis
+#include <optional>         // std::optional
 #include <print>            // std::println
 #include <string>           // std::string
 
@@ -42,36 +43,77 @@ int main() {
 
         ImVec2 displaySize = ImGui::GetIO().DisplaySize;
 
-        ImGui::SetNextWindowPos(ImVec2(displaySize.x - 600.0f, 0.0f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(600.0f, displaySize.y), ImGuiCond_Always);
-
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(500.0f, displaySize.y), ImGuiCond_Always);
+        
         ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         ImGui::Text("Welcome to dbd winstreak tracker!");
-
-        static bool enableCheckbox = false;
-        ImGui::Checkbox("Enable dbd winstreak counter", &enableCheckbox);
         
-        static std::uint16_t counter{};
-        if(enableCheckbox) {
-            if(ImGui::Button("+1")) {
-                ++counter;
-                std::println("Counter: {}", counter);
-            }
+        static char buffer[128]{};
+        ImGui::InputText("Killer", buffer, sizeof(buffer));
+        
+        const std::string killerName = buffer;
+        const bool hasKiller = !killerName.empty();
 
-            if(ImGui::Button("-1")) {
-                const auto result = g.inputHandling(counter, 0, "Cannot go past zero!");
-                if(!result) {
-                    std::println("{}", result.error());
-                } else {
-                    --counter;
-                    std::println("Counter: {}", counter);
+        ImGui::Text("Selected killer: %s", hasKiller ? killerName.c_str() : "none");
+        ImGui::Separator();
+
+        static std::optional<GUI::UI> button;
+        if(!hasKiller) {
+            button.reset();
+        }
+
+        if(hasKiller) {
+            if(ImGui::Button("Winstreak Counter", ImVec2(-1, 0))) {
+                button = GUI::UI::counter;
+            }
+    
+            if(ImGui::Button(std::format("View {}'s stats", killerName).c_str(), ImVec2(-1, 0))) {
+                button = GUI::UI::viewStats;
+            }
+    
+            if(ImGui::Button(std::format("Reset {}'s stats", killerName).c_str(), ImVec2(-1, 0))) {
+                button = GUI::UI::resetStats;
+            }
+    
+            if(ImGui::Button(std::format("Set {}'s stats", killerName).c_str(), ImVec2(-1, 0))) {
+                button = GUI::UI::setStats;
+            }
+    
+            if(ImGui::Button("Query stats", ImVec2(-1, 0))) {
+                button = GUI::UI::query;
+            }
+        }
+        
+        if(button) {
+            switch(*button) {
+                case GUI::UI::counter: {
+                    static std::uint16_t counter{};
+                    if(ImGui::Button("+1")) {
+                        ++counter;
+                        std::println("Counter: {}", counter);
+                    }
+    
+                    if(ImGui::Button("-1")) {
+                        const auto result = g.inputHandling(counter, 0, "Cannot go past zero!");
+                        if(!result) {
+                            std::println("{}", result.error());
+                        } else {
+                            --counter;
+                            std::println("Counter: {}", counter);
+                        }
+                    }
+    
+                    break;
+                }
+    
+                case GUI::UI::viewStats: {
+                    ImGui::Text(std::format("Killer: {}\nWins: 0\nPB: 2", killerName).c_str());
+                    break;
                 }
             }
         }
 
-        static char name[128]{};
-        ImGui::InputText("Change Killer", name, sizeof(name));
-        
         ImGui::End();
         
         ImGui::Render();

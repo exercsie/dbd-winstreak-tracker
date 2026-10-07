@@ -5,6 +5,15 @@
 
 class GUI {
 public:
+    // UI Menu button enums
+    enum class UI { 
+        counter,
+        viewStats,
+        resetStats,
+        setStats,
+        query
+    };
+
     // Constructor
     GUI() = default;
 
