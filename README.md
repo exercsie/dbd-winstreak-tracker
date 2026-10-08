@@ -16,6 +16,11 @@ sudo dnf install glfw-devel mesa-libGL-devel
 sudo pacman -S glfw mesa
 ```
 
+### Debian
+```
+sudo apt install libglfw3 libglfw3-dev libgl1-mesa-dev
+```
+
 ## Build
 ### CLI
 ```
