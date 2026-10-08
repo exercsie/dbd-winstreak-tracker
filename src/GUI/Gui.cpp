@@ -55,7 +55,7 @@ int main() {
     GUI g;
     glfwInit();
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "dbd-winstreak-tracker", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1000, 700, "dbd-winstreak-tracker", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
 
@@ -79,10 +79,18 @@ int main() {
 
         ImVec2 displaySize = ImGui::GetIO().DisplaySize;
 
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
+
+        const ImGuiViewport* viewPort = ImGui::GetMainViewport();
+
+        ImGui::SetNextWindowPos(viewPort->WorkPos, ImGuiCond_Always);
+        ImGui::SetNextWindowSize(viewPort->WorkSize, ImGuiCond_Always);
+        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+
+        // side bar
+        /*ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(550.0f, displaySize.y), ImGuiCond_Always);
-        
-        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);*/
+
         ImGui::Text("Welcome to dbd winstreak tracker!");
         ImGui::Text("Enter your killer: ");
         
@@ -120,11 +128,6 @@ int main() {
         if(killerSelected) {
             if(ImGui::Button("Winstreak Counter", ImVec2(-1, 0))) {
                 button = GUI::UI::counter;
-            }
-    
-            if(ImGui::Button(std::format("View {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
-                button = GUI::UI::viewStats;
-                error.clear();
             }
     
             if(ImGui::Button(std::format("Reset {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
@@ -165,11 +168,6 @@ int main() {
                     break;
                 }
     
-                case GUI::UI::viewStats: {
-                    ImGui::Text(std::format("Killer: {}\nWins: {}\nPB: {}", selectedKiller, t.getWins(), t.getPersonalBest()).c_str());
-                    break;
-                }
-
                 case GUI::UI::resetStats: {
                     if(ImGui::Button("Reset winstreak")) {
                         ImGui::OpenPopup("Confirm winstreak reset");
@@ -293,6 +291,11 @@ int main() {
                     static int n{};
 
                     if(ImGui::BeginTabBar("Query tabs")) {
+                        if(ImGui::BeginTabItem(std::format("{}'s stats", selectedKiller).c_str())) {
+                            ImGui::Text(std::format("Killer: {}\nWins: {}\nPB: {}", selectedKiller, t.getWins(), t.getPersonalBest()).c_str());
+                            ImGui::EndTabItem();
+                        }
+
                         if(ImGui::BeginTabItem("All killers")) {
                             g.displayAllKillerStats(t);
                             ImGui::EndTabItem();

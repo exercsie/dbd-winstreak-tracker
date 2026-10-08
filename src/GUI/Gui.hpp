@@ -9,7 +9,6 @@ public:
     // UI Menu button enums
     enum class UI { 
         counter,
-        viewStats,
         resetStats,
         setStats,
         query
