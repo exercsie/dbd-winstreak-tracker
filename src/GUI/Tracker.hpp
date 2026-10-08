@@ -10,7 +10,6 @@
 
 class Tracker {
 public:
-    
     // Data
     struct data {
         std::uint16_t wins{};
@@ -42,12 +41,6 @@ public:
     [[nodiscard]] std::expected<void, std::string> setPersonalBest(int pb);
     void setKiller(const std::string& k) { killer = k; }
 
-    // Display logic
-    /*void displaySpecificKillerStats(const std::string& killerName) const noexcept;
-    void displayAllKillerStats() const noexcept;
-    void displayKillerWinstreaksInReferenceToN(const int n) const noexcept;
-    void displayKillerPersonalBestsInReferenceToN(const int n) const noexcept;*/
-
     // Checker
     [[nodiscard]] bool isValidKiller() const { return tracker.contains(killer); }
 
@@ -55,6 +48,7 @@ public:
     [[nodiscard]] std::uint16_t getWins() const noexcept { return d.wins; }
     [[nodiscard]] std::uint16_t getPersonalBest() const noexcept { return d.personalBest; }
     [[nodiscard]] const std::unordered_map<std::string, data>& getMap() const noexcept { return tracker; }
+    [[nodiscard]] const std::string getKiller() const noexcept { return killer; }
 private:
     const std::filesystem::path dbdWinTrackerDirectory = std::filesystem::path(std::getenv("HOME")) / ".config/tracker";
     const std::filesystem::path dbdWinTrackerFile = dbdWinTrackerDirectory / "killer_win_info.txt";
