@@ -4,12 +4,10 @@
 #include "Gui.hpp"
 #include "Tracker.hpp"
 
-#include <cstdint>          // std::uint16_t
-#include <expected>         // std::expected, std::unexpected
+#include <expected>         // std::expected
 #include <format>           // std::format
 #include <GLFW/glfw3.h>     // gl apis
 #include <optional>         // std::optional
-#include <print>            // std::println
 #include <string>           // std::string
 
 int main() {
@@ -55,14 +53,16 @@ int main() {
         ImGui::Text("Welcome to dbd winstreak tracker!");
         ImGui::Text("Enter your killer: ");
         
+        
         static char buffer[128]{};
-        if(ImGui::InputText("##", buffer, sizeof(buffer))) {
+        const bool enter = ImGui::InputText("##", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue);
+
+        // Update UI in real-time as a killer is entered
+        if(ImGui::IsItemEdited()) {
             killerSelected = false;
         }
-        
-        static std::optional<GUI::UI> button;
 
-        if(ImGui::Button("Select killer")) {
+        if(ImGui::Button("Select killer") || enter) {
             t.setKiller(t.killerNormalisation(buffer));
             t.buildKillerWinMap();
             killerSelected = t.isValidKiller();
@@ -74,19 +74,19 @@ int main() {
                 error = std::format("{} does not exist. Example: \"The Terrifier\".", buffer);
             }
         }
-
+        
+        static std::optional<GUI::UI> button;
         if(!killerSelected) {
             button.reset();
         }
 
         if(!error.empty()) {
-            ImGui::TextColored(ImVec4(1, .3f, .3f, 1), "%s", error.c_str());
+            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "%s", error.c_str());
         }
 
-        ImGui::Text("Selected killer: %s", killerSelected ? selectedKiller.c_str() : "none");
-        ImGui::Separator();
-
         if(killerSelected) {
+            ImGui::Text(std::format("Selected killer: {}", killerSelected ? selectedKiller : "none").c_str());
+            ImGui::Separator();
             if(ImGui::Button("Winstreak Counter", ImVec2(-1, 0))) {
                 button = GUI::UI::counter;
             }
@@ -110,8 +110,10 @@ int main() {
         if(button) {
             switch(*button) {
                 case GUI::UI::counter: {
-                    ImGui::Text("Wins: %d PB: %d", t.getWins(), t.getPersonalBest());
-                    if(ImGui::Button("+1")) {
+                    ImGui::Text(std::format("{}'s stats: ", selectedKiller).c_str());
+                    ImGui::Separator();
+                    ImGui::Text(std::format("Wins: {}\nPB: {}", t.getWins(), t.getPersonalBest()).c_str());
+                    if(g.buttonColour("+1", ImVec4(0.0f, 1.0f, 0.0f, 0.1f))) {
                         t.incrementWins();
                         if(!error.empty()) {
                             error.clear();
@@ -119,7 +121,7 @@ int main() {
                     }
 
                     ImGui::SameLine();
-                    if(ImGui::Button("-1")) {
+                    if(g.buttonColour("-1", ImVec4(1.0f, 0.0f, 0.0f, 0.1f))) {
                         const std::expected r = t.decrementWins();
                         if(!r) {
                             error = r.error();
@@ -141,7 +143,7 @@ int main() {
 
                     if(ImGui::BeginPopupModal("Confirm winstreak reset", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
                         ImGui::Text(std::format("Reset {}'s winstreak?", selectedKiller).c_str());
-                        if(ImGui::Button("Yes")) {
+                        if(g.buttonColour("Yes", ImVec4(0.0f, 1.0f, 0.0f, 0.1f))) {
                             const std::expected r = t.resetWinstreak();
                             if(!r) {
                                 error = r.error();
@@ -153,7 +155,7 @@ int main() {
                         }
 
                         ImGui::SameLine();
-                        if(ImGui::Button("No")) {
+                        if(g.buttonColour("No", ImVec4(1.0f, 0.0f, 0.0f, 0.1f))) {
                             error.clear();
                             ImGui::CloseCurrentPopup();
                         }
@@ -163,7 +165,7 @@ int main() {
 
                     if(ImGui::BeginPopupModal("Confirm PB reset", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
                         ImGui::Text(std::format("Reset {}'s personal best? (This resets current wins)", selectedKiller).c_str());
-                        if(ImGui::Button("Yes")) {
+                        if(g.buttonColour("Yes", ImVec4(0.0f, 1.0f, 0.0f, 0.1f))) {
                             const std::expected r = t.resetPersonalBest();
                             if(!r) {
                                 error = r.error();
@@ -175,7 +177,7 @@ int main() {
                         }
 
                         ImGui::SameLine();
-                        if(ImGui::Button("No")) {
+                        if(g.buttonColour("No", ImVec4(1.0f, 0.0f, 0.0f, 0.1f))) {
                             error.clear();
                             ImGui::CloseCurrentPopup();
                         }
@@ -193,13 +195,14 @@ int main() {
                     }
 
                     if(ImGui::BeginPopupModal("Enter winstreak value", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::InputInt("Wins", &tempWins);
-                        if(ImGui::Button("Apply")) {
+                        const bool enter = ImGui::InputInt("##", &tempWins, ImGuiInputTextFlags_EnterReturnsTrue);
+                        if(g.buttonColour("Apply", ImVec4(0.0f, 1.0f, 0.0f, 0.1f)) || enter) {
                             const std::expected r = t.setWins(tempWins);
                             if(!r) {
                                 tempWins = 0;
                                 error = r.error();
                             } else {
+                                tempWins = 0;
                                 error.clear();
                             }
 
@@ -208,7 +211,7 @@ int main() {
 
                         ImGui::SameLine();
 
-                        if(ImGui::Button("Cancel")) {
+                        if(g.buttonColour("Cancel", ImVec4(1.0f, 0.0f, 0.0f, 0.1f))) {
                             ImGui::CloseCurrentPopup();
                         }
 
@@ -223,13 +226,14 @@ int main() {
 
                     static int tempPB{};
                     if(ImGui::BeginPopupModal("Enter personal best value", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        ImGui::InputInt("Wins", &tempPB);
-                        if(ImGui::Button("Apply")) {
+                        const bool enter = ImGui::InputInt("##", &tempPB, ImGuiInputTextFlags_EnterReturnsTrue);
+                        if(g.buttonColour("Apply", ImVec4(0.0f, 255.0f, 0.0f, 0.1f)) || enter) {
                             const std::expected r = t.setPersonalBest(tempPB);
                             if(!r) {
                                 tempPB = 0;
                                 error = r.error();
                             } else {
+                                tempPB = 0;
                                 error.clear();
                             }
 
@@ -238,7 +242,7 @@ int main() {
 
                         ImGui::SameLine();
 
-                        if(ImGui::Button("Cancel")) {
+                        if(g.buttonColour("Cancel", ImVec4(255.0f, 0.0f, 0.0f, 0.1f))) {
                             ImGui::CloseCurrentPopup();
                         }
 
@@ -264,12 +268,20 @@ int main() {
     
                         if(ImGui::BeginTabItem("Wins >= N")) {
                             ImGui::InputInt("##", &n);
+                            if(n < 0) {
+                                n = 0;
+                            }
+
                             g.displayKillerWinstreaksInReferenceToN(t, n);
                             ImGui::EndTabItem();
                         }
     
                         if(ImGui::BeginTabItem("Personal bests >= N")) {
                             ImGui::InputInt("##", &n);
+                            if(n < 0) {
+                                n = 0;
+                            }
+                            
                             g.displayKillerPersonalBestsInReferenceToN(t, n);
                             ImGui::EndTabItem();
                         }

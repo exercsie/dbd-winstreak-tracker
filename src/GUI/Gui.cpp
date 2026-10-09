@@ -6,6 +6,15 @@
 
 #include <format>           // std::format
 
+bool GUI::buttonColour(const char* name, ImVec4 v, ImVec2 size) {
+    ImGui::PushStyleColor(ImGuiCol_Button, v);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(v.x + 0.1f, v.y + 0.1f, v.z + 0.1f, 1.0f)); // add +.1 on hover
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(v.x - 0.1f, v.y - 0.1f, v.z - 0.1f, 1.0f)); // decrement -.1 on press to simulate diff states
+    const bool isButtonPressed = ImGui::Button(name, size);
+    ImGui::PopStyleColor(3);
+    return isButtonPressed;
+}
+
 void GUI::displayAllKillerStats(const Tracker& t) const noexcept {
     for(const auto& [killer, data] : t.getMap()) {
         ImGui::Separator();

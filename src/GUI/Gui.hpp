@@ -20,6 +20,9 @@ public:
     // Destructor
     ~GUI() = default;
 
+    // Button UI
+    bool buttonColour(const char* name, ImVec4 v, ImVec2 size = ImVec2(100, 0));
+
     // Query logic
     void displayAllKillerStats(const Tracker& t) const noexcept;
     void displayKillerWinstreaksInReferenceToN(const Tracker& t, const int n) const noexcept;
