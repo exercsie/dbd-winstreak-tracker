@@ -1,7 +1,7 @@
 #include "../../Dependencies/imgui/imgui.h"
 #include "../../Dependencies/imgui/backends/imgui_impl_glfw.h"
 #include "../../Dependencies/imgui/backends/imgui_impl_opengl3.h"
-#include "Gui.hpp"
+#include "Gui.hpp"          // Includes font headers
 #include "Tracker.hpp"
 
 #include <expected>         // std::expected
@@ -20,7 +20,19 @@ int main() {
 
     ImGui::CreateContext();
 
-    ImGui::GetIO().FontGlobalScale = 1.5f;
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Load custom fonts
+    ImFont* notoSansFont = g.staticFontLoader(NotoSans_Regular_ttf, NotoSans_Regular_ttf_len, 25.0f);
+    //ImFont* newFont = g.staticFontLoader(NewFont_Regular_ttf, NewFont_Regular_ttf_len, x.yf);
+
+    // default ImGui font
+    ImFontConfig cfg;
+    cfg.SizePixels = 25.0f;
+    ImFont* defaultImGuiFont = io.Fonts->AddFontDefault(&cfg);
+
+    // Set default font
+    io.FontDefault = notoSansFont;
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
@@ -38,7 +50,6 @@ int main() {
 
         ImVec2 displaySize = ImGui::GetIO().DisplaySize;
 
-
         const ImGuiViewport* viewPort = ImGui::GetMainViewport();
 
         ImGui::SetNextWindowPos(viewPort->WorkPos, ImGuiCond_Always);
@@ -52,8 +63,7 @@ int main() {
 
         ImGui::Text("Welcome to dbd winstreak tracker!");
         ImGui::Text("Enter your killer: ");
-        
-        
+
         static char buffer[128]{};
         const bool enter = ImGui::InputText("##", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue);
 

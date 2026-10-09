@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Tracker.hpp"
+#include "../../Assets/Fonts/NotoSans/NotoSans.hpp"
+
+#include <cstdint>          // std::uint8_t, std::uint32_t
 
 class GUI {
 private:
@@ -25,6 +28,9 @@ public:
 
     // Query logic
     void displayAllKillerStats(const Tracker& t) const noexcept;
-    void displayKillerWinstreaksInReferenceToN(const Tracker& t, const int n) const noexcept;
-    void displayKillerPersonalBestsInReferenceToN(const Tracker& t, const int n) const noexcept;
+    void displayKillerWinstreaksInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept;
+    void displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept;
+
+    // Font wrapper
+    [[nodiscard]] ImFont* staticFontLoader(std::uint8_t* fontData, const std::uint32_t fontLength, float size = 20.0f);
 };

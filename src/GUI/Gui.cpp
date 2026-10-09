@@ -4,6 +4,7 @@
 #include "Gui.hpp"
 #include "Tracker.hpp"
 
+#include <cstdint>          // std::uint32_t
 #include <format>           // std::format
 
 bool GUI::buttonColour(const char* name, ImVec4 v, ImVec2 size) {
@@ -22,7 +23,7 @@ void GUI::displayAllKillerStats(const Tracker& t) const noexcept {
     }
 }
 
-void GUI::displayKillerWinstreaksInReferenceToN(const Tracker& t, const int n) const noexcept {
+void GUI::displayKillerWinstreaksInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept {
     bool notFound = true;
     for(const auto& [killer, data] : t.getMap()) {
         if(data.wins >= n) {
@@ -38,7 +39,7 @@ void GUI::displayKillerWinstreaksInReferenceToN(const Tracker& t, const int n) c
     }
 } 
 
-void GUI::displayKillerPersonalBestsInReferenceToN(const Tracker& t, const int n) const noexcept {
+void GUI::displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept {
     bool notFound = true;
     for(const auto& [killer, data] : t.getMap()) {
         if(data.personalBest >= n) {
@@ -52,4 +53,14 @@ void GUI::displayKillerPersonalBestsInReferenceToN(const Tracker& t, const int n
         ImGui::Separator();
         ImGui::Text("No results found!");
     }
+}
+
+// Load C style array fonts from memory
+// https://www.youtube.com/watch?v=_LXZvuy5olY
+ImFont* GUI::staticFontLoader(std::uint8_t* fontData, const std::uint32_t fontLength, float size) {
+    ImGuiIO& io = ImGui::GetIO();
+    
+    ImFontConfig cfg;
+    cfg.FontDataOwnedByAtlas = false;
+    return io.Fonts->AddFontFromMemoryTTF(fontData, fontLength, size, &cfg);
 }
