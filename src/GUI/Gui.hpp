@@ -26,10 +26,14 @@ public:
     // Button UI
     bool buttonColour(const char* name, ImVec4 v, ImVec2 size = ImVec2(100, 0));
 
-    // Query logic
+    // Query
+    void QueryOption(const Tracker& t, ImVec2& displaySize, const std::string& selectedKiller);
     void displayAllKillerStats(const Tracker& t) const noexcept;
     void displayKillerWinstreaksInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept;
     void displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept;
+
+    // Killer View
+    void KillerOption(ImVec2& displaySize);
 
     // Font wrapper
     [[nodiscard]] ImFont* staticFontLoader(std::uint8_t* fontData, const std::uint32_t fontLength, float size = 20.0f);

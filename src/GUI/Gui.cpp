@@ -16,6 +16,50 @@ bool GUI::buttonColour(const char* name, ImVec4 v, ImVec2 size) {
     return isButtonPressed;
 }
 
+void GUI::QueryOption(const Tracker& t, ImVec2& displaySize, const std::string& selectedKiller) {
+    static int n{};
+
+    ImGui::SetNextWindowPos(ImVec2(370.0f, 850.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(displaySize.x - 370.0f, displaySize.y - 850.0f), ImGuiCond_Always); // - by window pos to ensure all vals are on the screen
+    ImGui::Begin("Query view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+    if(ImGui::BeginTabBar("Query tabs")) {
+        if(ImGui::BeginTabItem(std::format("{}'s stats", selectedKiller).c_str())) {
+            ImGui::Text(std::format("Killer: {}\nWins: {}\nPB: {}", selectedKiller, t.getWins(), t.getPersonalBest()).c_str());
+            ImGui::EndTabItem();
+        }
+
+        if(ImGui::BeginTabItem("All killers")) {
+            displayAllKillerStats(t);
+            ImGui::EndTabItem();
+        }
+
+        if(ImGui::BeginTabItem("Wins >= N")) {
+            ImGui::InputInt("##", &n);
+            if(n < 0) {
+                n = 0;
+            }
+
+            displayKillerWinstreaksInReferenceToN(t, n);
+            ImGui::EndTabItem();
+        }
+
+        if(ImGui::BeginTabItem("Personal bests >= N")) {
+            ImGui::InputInt("##", &n);
+            if(n < 0) {
+                n = 0;
+            }
+            
+            displayKillerPersonalBestsInReferenceToN(t, n);
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
+
+    ImGui::End();
+}
+
 void GUI::displayAllKillerStats(const Tracker& t) const noexcept {
     for(const auto& [killer, data] : t.getMap()) {
         ImGui::Separator();
@@ -53,6 +97,14 @@ void GUI::displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::
         ImGui::Separator();
         ImGui::Text("No results found!");
     }
+}
+
+void GUI::KillerOption(ImVec2& displaySize) {
+    ImGui::SetNextWindowPos(ImVec2(370.0f, 0.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(displaySize.x, displaySize.y), ImGuiCond_Always);
+    ImGui::Begin("Killer view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    ImGui::End();
 }
 
 // Load C style array fonts from memory

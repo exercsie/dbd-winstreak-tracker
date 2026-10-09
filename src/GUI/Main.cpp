@@ -14,7 +14,10 @@ int main() {
     GUI g;
     glfwInit();
 
-    GLFWwindow* window = glfwCreateWindow(1000, 700, "dbd-winstreak-tracker", nullptr, nullptr);
+    // Start maximised 
+    //glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
+    GLFWwindow* window = glfwCreateWindow(950, 1000, "dbd-winstreak-tracker", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
 
@@ -58,7 +61,7 @@ int main() {
 
         // side bar
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(550.0f, displaySize.y), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(370.0f, displaySize.y), ImGuiCond_Always);
         ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
         ImGui::Text("Welcome to dbd winstreak tracker!");
@@ -72,7 +75,7 @@ int main() {
             killerSelected = false;
         }
 
-        if(ImGui::Button("Select killer") || enter) {
+        if(ImGui::SameLine(); ImGui::Button("Select killer") || enter) {
             t.setKiller(t.killerNormalisation(buffer));
             t.buildKillerWinMap();
             killerSelected = t.isValidKiller();
@@ -267,42 +270,7 @@ int main() {
                 }
 
                 case GUI::UI::query: {
-                    static int n{};
-
-                    if(ImGui::BeginTabBar("Query tabs")) {
-                        if(ImGui::BeginTabItem(std::format("{}'s stats", selectedKiller).c_str())) {
-                            ImGui::Text(std::format("Killer: {}\nWins: {}\nPB: {}", selectedKiller, t.getWins(), t.getPersonalBest()).c_str());
-                            ImGui::EndTabItem();
-                        }
-
-                        if(ImGui::BeginTabItem("All killers")) {
-                            g.displayAllKillerStats(t);
-                            ImGui::EndTabItem();
-                        }
-    
-                        if(ImGui::BeginTabItem("Wins >= N")) {
-                            ImGui::InputInt("##", &n);
-                            if(n < 0) {
-                                n = 0;
-                            }
-
-                            g.displayKillerWinstreaksInReferenceToN(t, n);
-                            ImGui::EndTabItem();
-                        }
-    
-                        if(ImGui::BeginTabItem("Personal bests >= N")) {
-                            ImGui::InputInt("##", &n);
-                            if(n < 0) {
-                                n = 0;
-                            }
-                            
-                            g.displayKillerPersonalBestsInReferenceToN(t, n);
-                            ImGui::EndTabItem();
-                        }
-
-                        ImGui::EndTabBar();
-                    }
-
+                    g.QueryOption(t, displaySize, selectedKiller);
                     break;
                 }
             }
@@ -310,6 +278,9 @@ int main() {
 
         ImGui::End();
         
+        // Killer View
+        g.KillerOption(displaySize);
+
         ImGui::Render();
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
