@@ -52,14 +52,14 @@ int main() {
 
         const ImGuiViewport* viewPort = ImGui::GetMainViewport();
 
-        ImGui::SetNextWindowPos(viewPort->WorkPos, ImGuiCond_Always);
+        /*ImGui::SetNextWindowPos(viewPort->WorkPos, ImGuiCond_Always);
         ImGui::SetNextWindowSize(viewPort->WorkSize, ImGuiCond_Always);
-        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);*/
 
         // side bar
-        /*ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(550.0f, displaySize.y), ImGuiCond_Always);
-        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);*/
+        ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
         ImGui::Text("Welcome to dbd winstreak tracker!");
         ImGui::Text("Enter your killer: ");
@@ -199,13 +199,14 @@ int main() {
                 }
 
                 case GUI::UI::setStats: {
-                    static int tempWins{};
                     if(ImGui::Button("Set winstreak")) {
                         ImGui::OpenPopup("Enter winstreak value");
                     }
-
+                    
+                    static int tempWins{};
                     if(ImGui::BeginPopupModal("Enter winstreak value", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        const bool enter = ImGui::InputInt("##", &tempWins, ImGuiInputTextFlags_EnterReturnsTrue);
+                        ImGui::InputInt("##", &tempWins, 1, 10);
+                        const bool enter = ImGui::IsKeyPressed(ImGuiKey_Enter);
                         if(g.buttonColour("Apply", ImVec4(0.0f, 1.0f, 0.0f, 0.1f)) || enter) {
                             const std::expected r = t.setWins(tempWins);
                             if(!r) {
@@ -222,6 +223,7 @@ int main() {
                         ImGui::SameLine();
 
                         if(g.buttonColour("Cancel", ImVec4(1.0f, 0.0f, 0.0f, 0.1f))) {
+                            tempWins = 0;
                             ImGui::CloseCurrentPopup();
                         }
 
@@ -236,8 +238,9 @@ int main() {
 
                     static int tempPB{};
                     if(ImGui::BeginPopupModal("Enter personal best value", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-                        const bool enter = ImGui::InputInt("##", &tempPB, ImGuiInputTextFlags_EnterReturnsTrue);
-                        if(g.buttonColour("Apply", ImVec4(0.0f, 255.0f, 0.0f, 0.1f)) || enter) {
+                        ImGui::InputInt("##", &tempPB, 1, 10);
+                        const bool enter = ImGui::IsKeyPressed(ImGuiKey_Enter);
+                        if(g.buttonColour("Apply", ImVec4(0.0f, 1.0f, 0.0f, 0.1f)) || enter) {
                             const std::expected r = t.setPersonalBest(tempPB);
                             if(!r) {
                                 tempPB = 0;
@@ -252,7 +255,8 @@ int main() {
 
                         ImGui::SameLine();
 
-                        if(g.buttonColour("Cancel", ImVec4(255.0f, 0.0f, 0.0f, 0.1f))) {
+                        if(g.buttonColour("Cancel", ImVec4(1.0f, 0.0f, 0.0f, 0.1f))) {
+                            tempPB = 0;
                             ImGui::CloseCurrentPopup();
                         }
 
