@@ -9,6 +9,7 @@ TRACKER_FILES = \
 
 # GUI version
 MYGUI_FILES = \
+	src/GUI/Main.cpp \
 	src/GUI/Gui.cpp \
 	src/GUI/Tracker.cpp
 
