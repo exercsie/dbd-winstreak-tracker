@@ -209,7 +209,7 @@ std::expected<void, std::string> Tracker::decrementWins() {
     return {};
 }
 
-std::expected<void, std::string> Tracker::resetWinstreak() {
+std::expected<std::string, std::string> Tracker::resetWinstreak() {
     if(d.wins == 0) {
         return std::unexpected(std::format("{}'s winstreak is already at 0!", killer));
     }
@@ -217,24 +217,24 @@ std::expected<void, std::string> Tracker::resetWinstreak() {
     d.wins = 0;
     mapUpdater();
     updateFile();
-    return {};
+    return std::format("{}'s winstreak has been reset!", killer);
 }
 
-std::expected<void, std::string> Tracker::resetPersonalBest() {
+std::expected<std::string, std::string> Tracker::resetPersonalBest() {
     if(d.personalBest == 0) {
-        return std::unexpected(std::format("{}'s personal best is already at 0!", killer));
+        return std::unexpected(std::format("{}'s PB is already at 0!", killer));
     }
     
     d.wins = 0;
     d.personalBest = 0;
     mapUpdater();
     updateFile();
-    return {};
+    return std::format("{}'s PB has been reset!", killer);
 }
 
-std::expected<void, std::string> Tracker::setWins(int w) {
+std::expected<std::string, std::string> Tracker::setWins(int w) {
     if(w < 0 || w > 65535) {
-        return std::unexpected("Wins vaue must be between 0 and 65535");
+        return std::unexpected("Wins vaue must be between 0 and 65535!");
     }
     
     const std::uint16_t newWins = static_cast<std::uint16_t>(w);
@@ -245,10 +245,10 @@ std::expected<void, std::string> Tracker::setWins(int w) {
     d.wins = newWins;
     mapUpdater();
     updateFile();
-    return {};
+    return std::format("{}'s wins has been set to {}!", killer, w);
 }
 
-std::expected<void, std::string> Tracker::setPersonalBest(int pb) {
+std::expected<std::string, std::string> Tracker::setPersonalBest(int pb) {
     if(pb < 0 || pb > 65535) {
         return std::unexpected("PB value must be between 0 and 65535");
     }
@@ -259,11 +259,11 @@ std::expected<void, std::string> Tracker::setPersonalBest(int pb) {
         d.personalBest = newPB;
         mapUpdater();
         updateFile();
-        return {};
+        return std::format("{}'s PB has been set to {}", killer, pb);
     }
 
     d.personalBest = newPB;
     mapUpdater();
     updateFile();
-    return {};
+    return std::format("{}'s PB has been set to {}", killer, pb);
 }

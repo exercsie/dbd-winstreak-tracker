@@ -10,16 +10,7 @@
 #include <optional>         // std::optional
 #include <string>           // std::string
 
-bool GUI::buttonColour(const char* name, ImVec4 v, ImVec2 size) {
-    ImGui::PushStyleColor(ImGuiCol_Button, v);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(v.x + 0.1f, v.y + 0.1f, v.z + 0.1f, 1.0f)); // add +.1 on hover
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(v.x - 0.1f, v.y - 0.1f, v.z - 0.1f, 1.0f)); // decrement -.1 on press to simulate diff states
-    const bool isButtonPressed = ImGui::Button(name, size);
-    ImGui::PopStyleColor(3);
-    return isButtonPressed;
-}
-
-void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::string& selectedKiller, std::string& error) {
+void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::string& selectedKiller, std::string& error, std::string& success) {
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(370.0f, displaySize.y), ImGuiCond_Always);
     ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
@@ -53,8 +44,12 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
         button.reset();
     }
 
+    if(!success.empty()) {
+        ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1), "%s", success.c_str());
+    }
+
     if(!error.empty()) {
-        ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "%s", error.c_str());
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1), "%s", error.c_str());
     }
 
     if(killerSelected) {
@@ -62,20 +57,25 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
         ImGui::Separator();
         if(ImGui::Button("Winstreak Counter", ImVec2(-1, 0))) {
             button = GUI::UI::counter;
+            success.clear();
+            error.clear();
         }
 
         if(ImGui::Button(std::format("Reset {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
             button = GUI::UI::resetStats;
+            success.clear();
             error.clear();
         }
 
         if(ImGui::Button(std::format("Set {}'s stats", selectedKiller).c_str(), ImVec2(-1, 0))) {
             button = GUI::UI::setStats;
+            success.clear();
             error.clear();
         }
 
         if(ImGui::Button("Query stats", ImVec2(-1, 0))) {
             button = GUI::UI::query;
+            success.clear();
             error.clear();
         }
     }
@@ -88,12 +88,12 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
             }
 
             case GUI::UI::resetStats: {
-                ResetStatsOption(t, error, selectedKiller);
+                ResetStatsOption(t, error, success, selectedKiller);
                 break;
             }
 
             case GUI::UI::setStats: {
-                SetStatsOption(t, error);
+                SetStatsOption(t, error, success);
                 break;
             }
 
@@ -105,6 +105,23 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
     }
 
     ImGui::End();
+}
+
+void GUI::KillerView(ImVec2& displaySize) {
+    ImGui::SetNextWindowPos(ImVec2(370.0f, 0.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(displaySize.x, displaySize.y), ImGuiCond_Always);
+    ImGui::Begin("Killer view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    ImGui::End();
+}
+
+bool GUI::buttonColour(const char* name, ImVec4 v, ImVec2 size) {
+    ImGui::PushStyleColor(ImGuiCol_Button, v);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(v.x + 0.1f, v.y + 0.1f, v.z + 0.1f, 1.0f)); // add +.1 on hover
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(v.x - 0.1f, v.y - 0.1f, v.z - 0.1f, 1.0f)); // decrement -.1 on press to simulate diff states
+    const bool isButtonPressed = ImGui::Button(name, size);
+    ImGui::PopStyleColor(3);
+    return isButtonPressed;
 }
 
 void GUI::CounterOption(Tracker& t, std::string& error, const std::string& selectedKiller) {
@@ -127,7 +144,7 @@ void GUI::CounterOption(Tracker& t, std::string& error, const std::string& selec
     }
 }
 
-void GUI::ResetStatsOption(Tracker& t, std::string& error, const std::string& selectedKiller) {
+void GUI::ResetStatsOption(Tracker& t, std::string& error, std::string& success, const std::string& selectedKiller) {
     if(ImGui::Button("Reset winstreak")) {
         ImGui::OpenPopup("Confirm winstreak reset");
     }
@@ -141,10 +158,12 @@ void GUI::ResetStatsOption(Tracker& t, std::string& error, const std::string& se
         ImGui::Text(std::format("Reset {}'s winstreak?", selectedKiller).c_str());
         if(buttonColour("Yes", ImVec4(0.0f, 1.0f, 0.0f, 0.1f))) {
             const std::expected r = t.resetWinstreak();
-            if(!r) {
-                error = r.error();
-            } else {
+            if(r) {
+                success = r.value();
                 error.clear();
+            } else {
+                error = r.error();
+                success.clear();
             }
 
             ImGui::CloseCurrentPopup();
@@ -163,10 +182,12 @@ void GUI::ResetStatsOption(Tracker& t, std::string& error, const std::string& se
         ImGui::Text(std::format("Reset {}'s personal best? (This resets current wins)", selectedKiller).c_str());
         if(buttonColour("Yes", ImVec4(0.0f, 1.0f, 0.0f, 0.1f))) {
             const std::expected r = t.resetPersonalBest();
-            if(!r) {
-                error = r.error();
-            } else {
+            if(r) {
+                success = r.value();
                 error.clear();
+            } else {
+                error = r.error();
+                success.clear();
             }
 
             ImGui::CloseCurrentPopup();
@@ -182,7 +203,7 @@ void GUI::ResetStatsOption(Tracker& t, std::string& error, const std::string& se
     }
 }
 
-void GUI::SetStatsOption(Tracker& t, std::string& error) {
+void GUI::SetStatsOption(Tracker& t, std::string& error, std::string& success) {
     if(ImGui::Button("Set winstreak")) {
         ImGui::OpenPopup("Enter winstreak value");
     }
@@ -193,12 +214,14 @@ void GUI::SetStatsOption(Tracker& t, std::string& error) {
         const bool enter = ImGui::IsKeyPressed(ImGuiKey_Enter);
         if(buttonColour("Apply", ImVec4(0.0f, 1.0f, 0.0f, 0.1f)) || enter) {
             const std::expected r = t.setWins(tempWins);
-            if(!r) {
+            if(r) {
                 tempWins = 0;
-                error = r.error();
+                success = r.value();
+                error.clear();
             } else {
                 tempWins = 0;
-                error.clear();
+                error = r.error();
+                success.clear();
             }
 
             ImGui::CloseCurrentPopup();
@@ -226,12 +249,14 @@ void GUI::SetStatsOption(Tracker& t, std::string& error) {
         const bool enter = ImGui::IsKeyPressed(ImGuiKey_Enter);
         if(buttonColour("Apply", ImVec4(0.0f, 1.0f, 0.0f, 0.1f)) || enter) {
             const std::expected r = t.setPersonalBest(tempPB);
-            if(!r) {
+            if(r) {
                 tempPB = 0;
-                error = r.error();
+                success = r.value();
+                error.clear();
             } else {
                 tempPB = 0;
-                error.clear();
+                error = r.error();
+                success.clear();
             }
 
             ImGui::CloseCurrentPopup();
@@ -331,13 +356,6 @@ void GUI::displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::
     }
 }
 
-void GUI::KillerView(ImVec2& displaySize) {
-    ImGui::SetNextWindowPos(ImVec2(370.0f, 0.0f), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(displaySize.x, displaySize.y), ImGuiCond_Always);
-    ImGui::Begin("Killer view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
-
-    ImGui::End();
-}
 
 // Load C style array fonts from memory
 // https://www.youtube.com/watch?v=_LXZvuy5olY

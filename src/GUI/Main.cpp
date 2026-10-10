@@ -39,8 +39,7 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 130");
 
     Tracker t;
-    std::string error;
-    std::string selectedKiller;
+    std::string error, success, selectedKiller;
     bool killerSelected = false;
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -58,7 +57,7 @@ int main() {
         ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);*/
 
         // Menu view
-        g.MenuView(t, displaySize, killerSelected, selectedKiller, error);
+        g.MenuView(t, displaySize, killerSelected, selectedKiller, error, success);
         
         // Killer View
         g.KillerView(displaySize);
