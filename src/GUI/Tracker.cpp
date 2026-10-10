@@ -40,7 +40,7 @@ void Tracker::populateFile(std::ofstream& populateFile) noexcept {
     populateFile << "THE-DEATHSLINGER | 0 | 0\n";
     populateFile << "THE-CLOWN | 0 | 0\n";
     populateFile << "THE-ARTIST | 0 | 0\n";
-    populateFile << "THE-DEMOGORGEN | 0 | 0\n";
+    populateFile << "THE-DEMOGORGON | 0 | 0\n";
     populateFile << "THE-GOOD-GUY | 0 | 0\n";
     populateFile << "THE-GHOST-FACE | 0 | 0\n";
     populateFile << "THE-PIG | 0 | 0\n";
@@ -151,7 +151,7 @@ std::string Tracker::killerNormalisation(std::string killer) {
         {"LEATHERFACE", "THE-CANNIBAL"},
         {"LEATHER-FACE", "THE-CANNIBAL"},
         {"BILLY", "THE-HILLBILLY"},
-        {"DEMO", "THE-DEMOGORGEN"},
+        {"DEMO", "THE-DEMOGORGON"},
         {"WESKER", "THE-MASTERMIND"},
         {"MYERS", "THE-SHAPE"},
         {"MICHAEL-MYERS", "THE-SHAPE"},

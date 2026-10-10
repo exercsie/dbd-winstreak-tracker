@@ -5,7 +5,6 @@
 #include "Tracker.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "../../Dependencies/stb_image.h"
-#include "../../Assets/Images/Killers/THE-BLIGHT.hpp"
 
 #include <GLFW/glfw3.h>     // gl apis
 #include <cstdint>          // std::uint8_t, std::uint32_t
@@ -13,6 +12,15 @@
 #include <format>           // std::format
 #include <optional>         // std::optional
 #include <string>           // std::string
+#include <unordered_map>    // std::unorderd_map
+#include <iostream>
+
+namespace {
+    struct LoadedImage {
+        std::uint32_t id;
+        GUI::ImageDetails details;
+    };
+}
 
 void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::string& selectedKiller, std::string& error, std::string& success) {
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
@@ -112,14 +120,38 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
     ImGui::End();
 }
 
-void GUI::KillerView(ImVec2& displaySize) {
-    static ImageDetails killerDetails;
-    static const std::optional<std::uint32_t> killerImage = imageLoader(K21_TheBlight_Portrait_png, K21_TheBlight_Portrait_png_len, killerDetails);
+void GUI::KillerView(ImVec2& displaySize, bool& killerSelected, const std::string& selectedKiller) {
+    static std::unordered_map<std::string, std::optional<LoadedImage>> memory;
+
     ImGui::SetNextWindowPos(ImVec2(370.0f, 0.0f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(displaySize.x, displaySize.y), ImGuiCond_Always);
     ImGui::Begin("Killer view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
-    if(killerImage) {
-        ImGui::Image(static_cast<ImTextureID>(*killerImage), ImVec2(killerDetails.width / 2, killerDetails.height / 2));
+    if(killerSelected) {
+        // check to see if we already have the image in memory
+        if(!memory.contains(selectedKiller)) {
+
+            // Load image
+            std::optional<LoadedImage> loaded;
+            
+            // Check to ensure that the killer has their respective image
+            auto imageChecker = killerImages.find(selectedKiller);
+            if(imageChecker != killerImages.end()) {
+                const SourceImage& src = killerImages.at(selectedKiller);
+                ImageDetails d;
+                if(const std::optional<std::uint32_t> id = imageLoader(src.bytes, src.length, d)) {
+                    loaded = LoadedImage{*id, d};
+                }
+            }
+
+            // save result
+            memory[selectedKiller] = loaded;
+        }
+
+        // display image
+        const std::optional<LoadedImage>& entry = memory.at(selectedKiller);
+        if(entry) {
+            ImGui::Image(static_cast<ImTextureID>(entry->id), ImVec2(entry->details.width / 2, entry->details.height / 2));
+        }
     }
 
     ImGui::End();

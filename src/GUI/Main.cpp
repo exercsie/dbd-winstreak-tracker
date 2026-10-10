@@ -60,7 +60,7 @@ int main() {
         g.MenuView(t, displaySize, killerSelected, selectedKiller, error, success);
         
         // Killer View
-        g.KillerView(displaySize);
+        g.KillerView(displaySize, killerSelected, selectedKiller);
 
         ImGui::Render();
         glClear(GL_COLOR_BUFFER_BIT);
