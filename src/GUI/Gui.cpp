@@ -3,8 +3,12 @@
 #include "../../Dependencies/imgui/backends/imgui_impl_opengl3.h"
 #include "Gui.hpp"
 #include "Tracker.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "../../Dependencies/stb_image.h"
+#include "../../Assets/Images/Killers/THE-BLIGHT.hpp"
 
-#include <cstdint>          // std::uint32_t
+#include <GLFW/glfw3.h>     // gl apis
+#include <cstdint>          // std::uint8_t, std::uint32_t
 #include <expected>         // std::expected
 #include <format>           // std::format
 #include <optional>         // std::optional
@@ -27,11 +31,12 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
     }
 
     if(ImGui::SameLine(); ImGui::Button("Select killer") || enter) {
-        t.setKiller(t.killerNormalisation(buffer));
+        const std::string normalised = t.killerNormalisation(buffer);
+        t.setKiller(normalised);
         t.buildKillerWinMap();
         killerSelected = t.isValidKiller();
         if(killerSelected) {
-            selectedKiller = t.killerNormalisation(buffer);
+            selectedKiller = normalised;
             // Remove prior error if killer name was entered incorrectly
             error.clear();
         } else {
@@ -108,9 +113,14 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
 }
 
 void GUI::KillerView(ImVec2& displaySize) {
+    static ImageDetails killerDetails;
+    static const std::optional<std::uint32_t> killerImage = imageLoader(K21_TheBlight_Portrait_png, K21_TheBlight_Portrait_png_len, killerDetails);
     ImGui::SetNextWindowPos(ImVec2(370.0f, 0.0f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(displaySize.x, displaySize.y), ImGuiCond_Always);
     ImGui::Begin("Killer view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
+    if(killerImage) {
+        ImGui::Image(static_cast<ImTextureID>(*killerImage), ImVec2(killerDetails.width / 2, killerDetails.height / 2));
+    }
 
     ImGui::End();
 }
@@ -356,6 +366,24 @@ void GUI::displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::
     }
 }
 
+std::optional<std::uint32_t> GUI::imageLoader(const std::uint8_t* bytes, int length, ImageDetails& details) {
+    int w{}, h{};
+    std::uint8_t* data = stbi_load_from_memory(bytes, length, &w, &h, nullptr, 4);
+
+    std::uint32_t textureID{};
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+
+    details.width = static_cast<float>(w);
+    details.height = static_cast<float>(h);
+    return textureID;
+}
 
 // Load C style array fonts from memory
 // https://www.youtube.com/watch?v=_LXZvuy5olY

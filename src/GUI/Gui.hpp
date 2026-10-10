@@ -4,9 +4,15 @@
 #include "../../Assets/Fonts/NotoSans/NotoSans.hpp"
 
 #include <cstdint>          // std::uint8_t, std::uint32_t
+#include <optional>         // std::optional
 
 class GUI {
 public:
+    struct ImageDetails {
+        float width{};
+        float height{};
+    };
+
     // UI Menu button enums
     enum class UI { 
         counter,
@@ -36,6 +42,9 @@ public:
     void displayAllKillerStats(const Tracker& t) const noexcept;
     void displayKillerWinstreaksInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept;
     void displayKillerPersonalBestsInReferenceToN(const Tracker& t, const std::uint32_t n) const noexcept;
+
+    // Image wrapper
+    [[nodiscard]] static std::optional<std::uint32_t> imageLoader(const std::uint8_t* bytes, int length, ImageDetails& details);
 
     // Font wrapper
     [[nodiscard]] ImFont* staticFontLoader(std::uint8_t* fontData, const std::uint32_t fontLength, float size = 20.0f);
