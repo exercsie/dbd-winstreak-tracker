@@ -8,6 +8,16 @@
 #include <GLFW/glfw3.h>     // gl apis
 #include <string>           // std::string
 
+namespace Main {
+    struct MainData {
+        Tracker t;
+        std::string error;
+        std::string success;
+        std::string selectedKiller;
+        bool killerSelected = false;
+    };
+}
+
 int main() {
     GUI g;
     glfwInit();
@@ -38,9 +48,7 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
-    Tracker t;
-    std::string error, success, selectedKiller;
-    bool killerSelected = false;
+    Main::MainData data;
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -57,10 +65,10 @@ int main() {
         ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);*/
 
         // Menu view
-        g.MenuView(t, displaySize, killerSelected, selectedKiller, error, success);
+        g.MenuView(data.t, displaySize, data.killerSelected, data.selectedKiller, data.error, data.success);
         
         // Killer View
-        g.KillerView(displaySize, killerSelected, selectedKiller);
+        g.KillerView(displaySize, data.killerSelected, data.selectedKiller);
 
         ImGui::Render();
         glClear(GL_COLOR_BUFFER_BIT);

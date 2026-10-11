@@ -13,9 +13,8 @@
 #include <optional>         // std::optional
 #include <string>           // std::string
 #include <unordered_map>    // std::unorderd_map
-#include <iostream>
 
-namespace {
+namespace Gui {
     struct LoadedImage {
         std::uint32_t id;
         GUI::ImageDetails details;
@@ -35,6 +34,8 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
 
     // Update UI in real-time as a killer is entered
     if(ImGui::IsItemEdited()) {
+        error.clear();
+        success.clear();
         killerSelected = false;
     }
 
@@ -66,7 +67,6 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
     }
 
     if(killerSelected) {
-        ImGui::Text(std::format("Selected killer: {}", killerSelected ? selectedKiller : "none").c_str());
         ImGui::Separator();
         if(ImGui::Button("Winstreak Counter", ImVec2(-1, 0))) {
             button = GUI::UI::counter;
@@ -121,17 +121,20 @@ void GUI::MenuView(Tracker& t, ImVec2& displaySize, bool& killerSelected, std::s
 }
 
 void GUI::KillerView(ImVec2& displaySize, bool& killerSelected, const std::string& selectedKiller) {
-    static std::unordered_map<std::string, std::optional<LoadedImage>> memory;
+    static std::unordered_map<std::string, std::optional<Gui::LoadedImage>> memory;
 
     ImGui::SetNextWindowPos(ImVec2(370.0f, 0.0f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(displaySize.x, displaySize.y), ImGuiCond_Always);
-    ImGui::Begin("Killer view", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
+    ImGui::Begin(std::format("Selected killer: {}", killerSelected ? selectedKiller : "NULL").c_str(), nullptr, 
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing
+    );
+    
     if(killerSelected) {
         // check to see if we already have the image in memory
         if(!memory.contains(selectedKiller)) {
 
             // Load image
-            std::optional<LoadedImage> loaded;
+            std::optional<Gui::LoadedImage> loaded;
             
             // Check to ensure that the killer has their respective image
             auto imageChecker = killerImages.find(selectedKiller);
@@ -139,7 +142,7 @@ void GUI::KillerView(ImVec2& displaySize, bool& killerSelected, const std::strin
                 const SourceImage& src = killerImages.at(selectedKiller);
                 ImageDetails d;
                 if(const std::optional<std::uint32_t> id = imageLoader(src.bytes, src.length, d)) {
-                    loaded = LoadedImage{*id, d};
+                    loaded = Gui::LoadedImage{*id, d};
                 }
             }
 
@@ -148,7 +151,7 @@ void GUI::KillerView(ImVec2& displaySize, bool& killerSelected, const std::strin
         }
 
         // display image
-        const std::optional<LoadedImage>& entry = memory.at(selectedKiller);
+        const std::optional<Gui::LoadedImage>& entry = memory.at(selectedKiller);
         if(entry) {
             ImGui::Image(static_cast<ImTextureID>(entry->id), ImVec2(entry->details.width / 2, entry->details.height / 2));
         }
