@@ -172,7 +172,8 @@ std::string Tracker::killerNormalisation(std::string killer) {
         {"DRAC", "THE-DARK-LORD"},
         {"KEN", "THE-GHOUL"},
         {"KEN-KANEKI", "THE-GHOUL"},
-        {"SPRINGTRAP", "THE-ANIMATRONIC"}
+        {"SPRINGTRAP", "THE-ANIMATRONIC"},
+        {"JASON", "THE-SLASHER"}
     };
 
     if(const auto it = aliases.find(killer); it != aliases.end()) {
